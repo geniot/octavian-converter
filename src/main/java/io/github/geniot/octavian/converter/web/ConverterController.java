@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ConverterController {
-    @PostMapping("/convert")
+    @PostMapping(value = "/convert", consumes = {"application/json"})
     public @ResponseBody
     MuseConversionResponse handleRefreshSubscription(@RequestBody MuseConversionRequest request) {
         MuseConversionResponse result = new MuseConversionResponse();
