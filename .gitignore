@@ -1,2 +1,6 @@
 .idea
-tmp
+target
+*.iml
+logs
+.mscbackup
+failed_files
