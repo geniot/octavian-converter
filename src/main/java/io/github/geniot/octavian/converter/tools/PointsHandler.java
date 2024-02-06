@@ -108,7 +108,7 @@ public class PointsHandler {
     public void setBars(IndexedTreeMap<Integer, Point> pointsMap, int[] barOffsets) throws Exception {
         for (Point point : pointsMap.values()) {
             int insertionPoint = Arrays.binarySearch(barOffsets, point.getOffsetX());
-            insertionPoint = Math.abs(insertionPoint) - 1;
+            insertionPoint = insertionPoint < 0 ? Math.abs(insertionPoint) - 1 : insertionPoint;
             point.setBar(insertionPoint);
         }
     }
