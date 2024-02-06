@@ -142,6 +142,11 @@ public class LayoutHandler {
         }
     }
 
+    public Map<String, Layout> extractFingerings(Tune tune) {
+        Map<String, Layout> map = new HashMap<>();
+        return map;
+    }
+
     /**
      * Optimistic merge without sizes check.
      *

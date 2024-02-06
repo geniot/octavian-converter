@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -26,6 +27,18 @@ public class Utils {
             }
         }
         throw new Exception("Couldn't find mscx file in the mscz archive.");
+    }
+
+    public static byte[] compressBytes(byte[] bytes)
+            throws IOException {
+        if (bytes == null) {
+            return null;
+        }
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream);
+        gzipOutputStream.write(bytes, 0, bytes.length);
+        gzipOutputStream.close();
+        return byteArrayOutputStream.toByteArray();
     }
 
     public static byte[] decompressBytes(final byte[] data)

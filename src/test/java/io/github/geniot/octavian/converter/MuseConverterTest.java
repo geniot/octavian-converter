@@ -68,7 +68,6 @@ public class MuseConverterTest {
 
                 String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(playerTune);
                 String expectedJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(playerExpectedTune);
-
                 json = json.replaceAll("\r\n", "\n");
                 expectedJson = expectedJson.replaceAll("\r\n", "\n");
 
@@ -80,7 +79,7 @@ public class MuseConverterTest {
         }
     }
 
-    private void stripFingers(Tune tune) {
+    public static void stripFingers(Tune tune) {
         for (Point point : tune.getPoints()) {
             if (point.getNotesOn() != null) {
                 for (Note note : point.getNotesOn()) {
