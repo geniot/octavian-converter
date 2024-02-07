@@ -3,7 +3,6 @@ package io.github.geniot.octavian.converter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.geniot.octavian.converter.model.*;
-import io.github.geniot.octavian.converter.tools.LayoutHandler;
 import io.github.geniot.octavian.converter.tools.MuseConverter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -30,7 +29,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class MuseConverterTest {
     @Test
     public void checksum() throws Exception {
-        LayoutHandler layoutHandler = new LayoutHandler();
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         Properties properties = new Properties();
@@ -43,7 +41,7 @@ public class MuseConverterTest {
                         properties.getProperty("spring.datasource.username"),
                         properties.getProperty("spring.datasource.password"))) {
 
-            String selectSql = "SELECT * FROM tune WHERE id=53";//61,39,54,56,60,53,64,102,103,115,
+            String selectSql = "SELECT * FROM tune WHERE id=64";//61,39,54,56,60,53,64,102,103,115,
             Statement stmt = con.createStatement();
             ResultSet resultSet = stmt.executeQuery(selectSql);
             while (resultSet.next()) {
@@ -62,9 +60,6 @@ public class MuseConverterTest {
 
                 Tune playerTune = response.getTune();
                 Tune playerExpectedTune = objectMapper.readValue(decompressBytes(resultSet.getBytes("json")), Tune.class);
-
-                stripFingers(playerTune);
-                stripFingers(playerExpectedTune);
 
                 stripChanging(playerTune);
                 stripChanging(playerExpectedTune);
@@ -96,18 +91,4 @@ public class MuseConverterTest {
         }
     }
 
-    public static void stripFingers(Tune tune) {
-        for (Point point : tune.getPoints()) {
-            if (point.getNotesOn() != null) {
-                for (Note note : point.getNotesOn()) {
-                    note.setFingers(null);
-                }
-            }
-            if (point.getNotesOff() != null) {
-                for (Note note : point.getNotesOff()) {
-                    note.setFingers(null);
-                }
-            }
-        }
-    }
 }

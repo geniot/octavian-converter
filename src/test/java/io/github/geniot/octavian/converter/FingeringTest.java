@@ -49,9 +49,6 @@ public class FingeringTest {
                     shouldUpdateRepeats = true;
                 }
 
-                MuseConverterTest.stripFingers(tune);
-                MuseConverterTest.stripFingers(repeatsTune);
-
                 String tuneJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(tune);
                 String repeatsTuneJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(repeatsTune);
 
