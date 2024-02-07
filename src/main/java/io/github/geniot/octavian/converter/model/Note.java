@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class Note implements Serializable {
-    Integer id;
+    Integer fid;
     Integer duration;
     NoteType noteType;
     Integer noteValue;
