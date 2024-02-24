@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.geniot.octavian.converter.model.Tune;
 import io.github.geniot.octavian.converter.tools.MuseConverter;
-import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
@@ -16,11 +15,8 @@ import static io.github.geniot.octavian.converter.tools.Utils.decompressBytes;
 public class FingeringTest {
     /**
      * Removes fingers from tunes
-     *
-     * @throws Exception
      */
-    @Test
-    public void strip() throws Exception {
+    public static void main(String[] args) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         Properties properties = new Properties();

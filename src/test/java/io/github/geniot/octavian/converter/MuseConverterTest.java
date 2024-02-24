@@ -2,11 +2,13 @@ package io.github.geniot.octavian.converter;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.geniot.octavian.converter.model.*;
+import io.github.geniot.octavian.converter.model.Instrument;
+import io.github.geniot.octavian.converter.model.MuseConversionResponse;
+import io.github.geniot.octavian.converter.model.Point;
+import io.github.geniot.octavian.converter.model.Tune;
 import io.github.geniot.octavian.converter.tools.MuseConverter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -27,8 +29,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 @Disabled
 public class MuseConverterTest {
-    @Test
-    public void checksum() throws Exception {
+    public static void main(String[] args) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         Properties properties = new Properties();
@@ -83,7 +84,7 @@ public class MuseConverterTest {
         }
     }
 
-    private void stripChanging(Tune tune) {
+    private static void stripChanging(Tune tune) {
         tune.setBarOffsets(null);
         tune.setSheetWidth(0);
         for (Point point : tune.getPoints()) {
