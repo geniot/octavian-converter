@@ -4,3 +4,4 @@ target
 logs
 .mscbackup
 failed_files
+tmp

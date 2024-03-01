@@ -49,7 +49,8 @@ public class MuseConverter {
                                           int pngHeight,
                                           String author,
                                           String title,
-                                          Instrument instrument) throws Exception {
+                                          Instrument instrument,
+                                          boolean shouldRemoveTmp) throws Exception {
 
         MuseConversionResponse MuseConversionResponse = new MuseConversionResponse();
         File tmpDir = null;
@@ -162,7 +163,7 @@ public class MuseConverter {
             return MuseConversionResponse;
 
         } finally {
-            if (tmpDir != null) {
+            if (shouldRemoveTmp && tmpDir != null) {
                 FileUtils.deleteDirectory(tmpDir);
             }
             try {

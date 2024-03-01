@@ -17,6 +17,6 @@ public class ConverterController {
     @PostMapping(value = "/convert", consumes = {"application/json"})
     public @ResponseBody
     MuseConversionResponse handleRefreshSubscription(@RequestBody MuseConversionRequest request) throws Exception {
-        return museConverter.convert(request.getMuseXml(), request.getPngHeight(), request.getAuthor(), request.getTitle(), request.getInstrument());
+        return museConverter.convert(request.getMuseXml(), request.getPngHeight(), request.getAuthor(), request.getTitle(), request.getInstrument(), true);
     }
 }

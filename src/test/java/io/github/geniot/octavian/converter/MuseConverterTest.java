@@ -56,7 +56,7 @@ public class MuseConverterTest {
                 Instrument instrument = Instrument.valueOf(resultSet.getString("instrument"));
                 System.out.println(id + " " + author + " " + title);
 
-                MuseConversionResponse response = museConverter.convert(museXml, pngHeight, author, title, instrument);
+                MuseConversionResponse response = museConverter.convert(museXml, pngHeight, author, title, instrument, true);
 //                int[] repeats = objectMapper.readValue(decompressBytes(resultSet.getBytes("repeats")), int[].class);
 
                 Tune playerTune = response.getTune();
