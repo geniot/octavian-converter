@@ -42,7 +42,6 @@ public class MuseConverter {
     SvgHandler svgHandler = new SvgHandler();
     MidiHandler midiHandler = new MidiHandler();
     PointsHandler pointsHandler = new PointsHandler();
-    ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     public MuseConversionResponse convert(String museXml,
                                           int pngHeight,
@@ -234,7 +233,10 @@ public class MuseConverter {
         callables.add(() -> runProcess(museScoreRun + " --trim-image 0 -o " + repeatsWideSvgOutputPath1 + " " + tmpRepeatsWideInputFile.getAbsolutePath()));
         callables.add(() -> runProcess(museScoreRun + " --dump-midi-out -o " + repeatsMidiLeftOutput + " " + tmpRepeatsLeftInputFile.getAbsolutePath()));
         callables.add(() -> runProcess(museScoreRun + " --dump-midi-out -o " + repeatsMidiRightOutput + " " + tmpRepeatsRightInputFile.getAbsolutePath()));
+
+        ExecutorService executorService = Executors.newFixedThreadPool(1);
         executorService.invokeAll(callables);
+        executorService.shutdown();
 
         byte[] svgBytes = FileUtils.readFileToByteArray(new File(svgOutputPath2));
         byte[] wideSvgBytes = FileUtils.readFileToByteArray(new File(wideSvgOutputPath2));

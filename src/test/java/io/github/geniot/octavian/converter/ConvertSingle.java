@@ -18,7 +18,7 @@ public class ConvertSingle {
             museConverter.setMuseScoreRun("xvfb-run -a -e /dev/stdout /opt/musescore/MuseScore-3.6.2.548021370-x86_64.AppImage");
             StringWriter writer = new StringWriter();
             IOUtils.copy(Thread.currentThread().getContextClassLoader().getResource("la_dame_de_monsoreau.mscx").openStream(), writer, StandardCharsets.UTF_8);
-            MuseConversionResponse response = museConverter.convert(writer.toString(), 300, "test", "test", Instrument.PIANO, true);
+            MuseConversionResponse response = museConverter.convert(writer.toString(), 300, "test", "test", Instrument.PIANO, false);
             System.out.println(response.getTune().getTitle());
         } catch (Exception ex) {
             ex.printStackTrace();
