@@ -1,27 +1,32 @@
 package io.github.geniot.octavian.converter.tools;
 
+import com.github.weisj.jsvg.SVGDocument;
+import com.github.weisj.jsvg.geometry.size.FloatSize;
+import com.github.weisj.jsvg.parser.SVGLoader;
 import io.github.geniot.indexedtreemap.IndexedTreeSet;
 import io.github.geniot.octavian.converter.model.SvgData;
 import io.github.geniot.octavian.converter.model.SvgNote;
 import io.github.geniot.octavian.converter.model.commands.CCommand;
 import io.github.geniot.octavian.converter.model.commands.DCommand;
 import io.github.geniot.octavian.converter.model.commands.MCommand;
-import org.apache.batik.transcoder.TranscoderInput;
-import org.apache.batik.transcoder.TranscoderOutput;
-import org.apache.batik.transcoder.image.PNGTranscoder;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -139,23 +144,23 @@ public class SvgHandler {
     }
 
     public byte[] svg2png(byte[] svgBytes, float width, float height) throws Exception {
-
+        SVGLoader loader = new SVGLoader();
+        SVGDocument svgDocument = loader.load(new ByteArrayInputStream(svgBytes));
+        FloatSize size = svgDocument.size();
+        BufferedImage image = new BufferedImage((int) size.width, (int) size.height, BufferedImage.TYPE_4BYTE_ABGR);
+        Graphics2D g = image.createGraphics();
+        g.setRenderingHint(
+                RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(
+                RenderingHints.KEY_STROKE_CONTROL,
+                RenderingHints.VALUE_STROKE_PURE);
+        svgDocument.render(null, g);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-        TranscoderInput transcoderInput = new TranscoderInput(new ByteArrayInputStream(svgBytes));
-        TranscoderOutput transcoderOutput = new TranscoderOutput(byteArrayOutputStream);
-
-        PNGTranscoder pngTranscoder = new PNGTranscoder();
-        pngTranscoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width);
-        pngTranscoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, height);
-        pngTranscoder.transcode(transcoderInput, transcoderOutput);
-
-        transcoderInput.getInputStream().close();
-        transcoderOutput.getOutputStream().close();
-
+        ImageIO.write(image, "PNG", byteArrayOutputStream);
+        g.dispose();
         byteArrayOutputStream.flush();
         byteArrayOutputStream.close();
-
         return byteArrayOutputStream.toByteArray();
     }
 

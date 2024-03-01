@@ -5,7 +5,6 @@ import io.github.geniot.indexedtreemap.IndexedTreeMap;
 import io.github.geniot.indexedtreemap.IndexedTreeSet;
 import io.github.geniot.octavian.converter.model.*;
 import lombok.Data;
-import org.apache.batik.ext.awt.image.rendered.TileCache;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,12 +164,6 @@ public class MuseConverter {
         } finally {
             if (shouldRemoveTmp && tmpDir != null) {
                 FileUtils.deleteDirectory(tmpDir);
-            }
-            try {
-                TileCache.setSize(0);
-                TileCache.setSize(2);
-            } catch (Exception ex) {
-                logger.error(ex.getMessage(), ex);
             }
         }
     }
