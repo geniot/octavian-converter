@@ -43,22 +43,22 @@ public class MuseConverter {
     MidiHandler midiHandler = new MidiHandler();
     PointsHandler pointsHandler = new PointsHandler();
 
-    public MuseConversionResponse convert(String museXml,
+    public MuseConversionResponse convert(String museXmlOrig,
                                           int pngHeight,
                                           String author,
                                           String title,
                                           Instrument instrument,
                                           boolean shouldRemoveTmp) throws Exception {
 
-        MuseConversionResponse MuseConversionResponse = new MuseConversionResponse();
+        MuseConversionResponse museConversionResponse = new MuseConversionResponse();
         File tmpDir = null;
 
         try {
             tmpDir = Files.createTempDirectory(String.valueOf(System.currentTimeMillis())).toFile();
             logger.info(tmpDir.getAbsolutePath());
 
-            MuseFixResult museFixResult = museHandler.fixMuseXml(museXml);
-            MuseHalfConversionResult museHalfConversionResult = getMuseHalfConversionResult(museFixResult, tmpDir);
+            MuseFixResult museFixResult = museHandler.fixMuseXml(museXmlOrig);
+            MuseHalfConversionResult museHalfConversionResult = getMuseHalfConversionResult(museXmlOrig, museFixResult, tmpDir);
 
             SvgData svgData = svgHandler.getSvgData(museHalfConversionResult.getSvgBytes(), museHalfConversionResult.getWideSvgBytes());
 
@@ -112,9 +112,12 @@ public class MuseConverter {
                     barOffsets,
                     pointsMap.values().toArray(new Point[0])
             );
-            MuseConversionResponse.setPngSheet(pngBytes);
-            MuseConversionResponse.setTune(tune);
-            return MuseConversionResponse;
+
+            museConversionResponse.setPngSheet(pngBytes);
+            museConversionResponse.setTune(tune);
+            museConversionResponse.setMp3(museHalfConversionResult.getMp3());
+
+            return museConversionResponse;
 
         } finally {
             if (shouldRemoveTmp && tmpDir != null) {
@@ -141,13 +144,17 @@ public class MuseConverter {
         return tune;
     }
 
-    private MuseHalfConversionResult getMuseHalfConversionResult(MuseFixResult museFixResult, File tmpDir) throws Exception {
+    private MuseHalfConversionResult getMuseHalfConversionResult(String museXmlOrig,
+                                                                 MuseFixResult museFixResult,
+                                                                 File tmpDir) throws Exception {
 
+        File tmpInputOrigFile = new File(tmpDir, "score_orig.mscx");
         File tmpInputFile = new File(tmpDir, "score.mscx");
         File tmpWideInputFile = new File(tmpDir, "score_wide.mscx");
         File tmpLeftInputFile = new File(tmpDir, "score_left.mscx");
         File tmpRightInputFile = new File(tmpDir, "score_right.mscx");
 
+        FileUtils.writeByteArrayToFile(tmpInputOrigFile, museXmlOrig.getBytes(StandardCharsets.UTF_8));
         FileUtils.writeByteArrayToFile(tmpInputFile, museFixResult.getScore().getBytes(StandardCharsets.UTF_8));
         FileUtils.writeByteArrayToFile(tmpWideInputFile, museFixResult.getWideScore().getBytes(StandardCharsets.UTF_8));
         FileUtils.writeByteArrayToFile(tmpLeftInputFile, museFixResult.getLeftScore().getBytes(StandardCharsets.UTF_8));
@@ -160,12 +167,14 @@ public class MuseConverter {
         String wideSvgOutputPath2 = tmpDir.getAbsolutePath() + File.separator + "score_wide-1.svg";
         String midiLeftOutput = tmpDir.getAbsolutePath() + File.separator + "score_left.mid";
         String midiRightOutput = tmpDir.getAbsolutePath() + File.separator + "score_right.mid";
+        String mp3Output = tmpDir.getAbsolutePath() + File.separator + "score.mp3";
 
         HashSet<Callable<Void>> callables = new HashSet<>();
         callables.add(() -> runProcess(museScoreRun + " --trim-image 0 -o " + svgOutputPath1 + " " + tmpInputFile.getAbsolutePath()));
         callables.add(() -> runProcess(museScoreRun + " --trim-image 0 -o " + wideSvgOutputPath1 + " " + tmpWideInputFile.getAbsolutePath()));
         callables.add(() -> runProcess(museScoreRun + " --dump-midi-out -o " + midiLeftOutput + " " + tmpLeftInputFile.getAbsolutePath()));
         callables.add(() -> runProcess(museScoreRun + " --dump-midi-out -o " + midiRightOutput + " " + tmpRightInputFile.getAbsolutePath()));
+        callables.add(() -> runProcess(museScoreRun + " -o " + mp3Output + " " + tmpInputOrigFile.getAbsolutePath()));
 
         ExecutorService executorService = Executors.newFixedThreadPool(1);
         executorService.invokeAll(callables);
@@ -175,6 +184,7 @@ public class MuseConverter {
         byte[] wideSvgBytes = FileUtils.readFileToByteArray(new File(wideSvgOutputPath2));
         byte[] leftMidiBytes = FileUtils.readFileToByteArray(new File(midiLeftOutput));
         byte[] rightMidiBytes = FileUtils.readFileToByteArray(new File(midiRightOutput));
+        byte[] mp3Bytes = FileUtils.readFileToByteArray(new File(mp3Output));
 
         MuseHalfConversionResult museHalfConversionResult = new MuseHalfConversionResult();
 
@@ -182,6 +192,7 @@ public class MuseConverter {
         museHalfConversionResult.setWideSvgBytes(wideSvgBytes);
         museHalfConversionResult.setLeftMidiBytes(leftMidiBytes);
         museHalfConversionResult.setRightMidiBytes(rightMidiBytes);
+        museHalfConversionResult.setMp3(mp3Bytes);
 
         return museHalfConversionResult;
     }

@@ -9,5 +9,6 @@ public class MuseHalfConversionResult {
     byte[] wideSvgBytes;
     byte[] leftMidiBytes;
     byte[] rightMidiBytes;
+    byte[] mp3;
 
 }
