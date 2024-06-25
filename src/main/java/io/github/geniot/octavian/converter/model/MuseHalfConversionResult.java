@@ -10,9 +10,4 @@ public class MuseHalfConversionResult {
     byte[] leftMidiBytes;
     byte[] rightMidiBytes;
 
-    byte[] repeatsSvgBytes;
-    byte[] repeatsWideSvgBytes;
-    byte[] repeatsLeftMidiBytes;
-    byte[] repeatsRightMidiBytes;
-
 }

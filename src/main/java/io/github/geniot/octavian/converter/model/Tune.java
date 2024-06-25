@@ -17,7 +17,4 @@ public class Tune implements Serializable {
     private int sheetWidth;
     private int sheetHeight;
     private int playHeadWidth;
-    private String free = "N";
-    private long lastUpdatedOn;
-
 }

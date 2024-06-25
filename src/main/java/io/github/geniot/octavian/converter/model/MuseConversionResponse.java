@@ -6,7 +6,4 @@ import lombok.Data;
 public class MuseConversionResponse {
     byte[] pngSheet;
     Tune tune;
-    byte[] repeatsPngSheet;
-    Tune repeatsTune;
-    int[] repeats;
 }

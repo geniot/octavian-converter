@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import io.github.geniot.octavian.converter.model.MuseFixResult;
 import io.github.geniot.octavian.converter.model.musescore.MuseScoreRoot;
-import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -56,17 +55,6 @@ public class MuseHandler {
         }
     }
 
-    public String getPanorama(String museXml, boolean shouldWiden, boolean shouldUnroll) throws Exception {
-        InputStream inputStream = new ByteArrayInputStream(museXml.getBytes(StandardCharsets.UTF_8));
-        Document document = docBuilder.parse(inputStream);
-        panoramize(document);
-        if (shouldUnroll) {
-            unroll(document);
-            cleanify(document);
-        }
-        return shouldWiden ? document2string(widen(document, xpath)) : document2string(document);
-    }
-
     public MuseFixResult fixMuseXml(String museXml) throws Exception {
         MuseFixResult museFixResult = new MuseFixResult();
 
@@ -76,27 +64,12 @@ public class MuseHandler {
 
         cleanifyGeneric(document);
 
-        //repeats
-        museFixResult.setRepScore(document2string(document));
-        museFixResult.setRepWideScore(document2string(widen(document, xpath)));
-
         Node[] repeatsRightLeft = getRightLeft(document);
         cleanify(repeatsRightLeft[0]);
         cleanify(repeatsRightLeft[1]);
 
-        String repeatsRightDocStr = document2string(repeatsRightLeft[0]);
-        String repeatsLeftDocStr = document2string(repeatsRightLeft[1]);
-
-        museFixResult.setRepRightScore(repeatsRightDocStr);
-        museFixResult.setRepLeftScore(repeatsLeftDocStr);
-
-        museFixResult.setRepRightRoot(xmlMapper.readValue(repeatsRightDocStr, MuseScoreRoot.class));
-        museFixResult.setRepLeftRoot(xmlMapper.readValue(repeatsLeftDocStr, MuseScoreRoot.class));
-
         //unrolling
-        List<Integer> unrolledOrder = unroll(document);
-        museFixResult.setRepeats(ArrayUtils.toPrimitive(unrolledOrder.toArray(new Integer[0])));
-
+        unroll(document);
         cleanify(document);
 
         Node[] rightLeft = getRightLeft(document);

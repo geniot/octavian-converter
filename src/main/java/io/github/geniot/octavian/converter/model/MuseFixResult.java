@@ -12,13 +12,4 @@ public class MuseFixResult {
     String rightScore;
     MuseScoreRoot rightRoot;
     MuseScoreRoot leftRoot;
-
-    String repScore;
-    String repWideScore;
-    String repLeftScore;
-    String repRightScore;
-    MuseScoreRoot repRightRoot;
-    MuseScoreRoot repLeftRoot;
-
-    int[] repeats;
 }
