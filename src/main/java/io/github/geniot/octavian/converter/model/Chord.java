@@ -203,6 +203,7 @@ public class Chord {
                 put(new String[]{AB3, C4, E4}, C7);
                 put(new String[]{GA3, CD4, F4}, CD7);
                 put(new String[]{C4, D4, FG4}, D7);
+                put(new String[]{D3, FG3, A3, C4}, D7);
                 put(new String[]{G3, CD4, DE4}, DE7);
                 put(new String[]{GA3, D4, E4}, E7);
                 put(new String[]{A3, DE4, F4}, F7);

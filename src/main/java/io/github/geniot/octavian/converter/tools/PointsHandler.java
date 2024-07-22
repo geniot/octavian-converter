@@ -138,33 +138,46 @@ public class PointsHandler {
 
 
     private void processBassesToChords(SortedSet<Integer> set, Point point, NoteState state) throws Exception {
-        if (set.size() == 3) {
-            String chord = getChordName(set, point.getBar());
-
-            Note note = new Note();
-            note.setNoteType(NoteType.LEFT_HAND_CHORD);
-            note.setChordName(chord);
-            note.setNoteName(Constants.NOTE_NAME_MAP.get(String.valueOf(note.getChordName())));
-            addNoteToPoint(note, point, state);
-        } else if (set.size() == 4) {//can be a chord, or a chord and a bass
-            //trying to identify the chord from 3 highest notes
-            String chord = getChordName(set.tailSet((Integer) set.toArray()[1]), point.getBar());
-
-            Note note = new Note();
-            note.setNoteType(NoteType.LEFT_HAND_CHORD);
-            note.setChordName(chord);
-            note.setNoteName(Constants.NOTE_NAME_MAP.get(String.valueOf(note.getChordName())));
-            addNoteToPoint(note, point, state);
-
-            //lowest note
-            Note noteLow = new Note();
-            noteLow.setNoteType(NoteType.LEFT_HAND_BASS);
-            noteLow.setNoteValue(set.first());
-            noteLow.setNoteName(Constants.NOTE_NAME_MAP.get(String.valueOf(noteLow.getNoteValue())));
-            addNoteToPoint(noteLow, point, state);
+        if (set.size() == 3) {//3
+            String chord = getChordName(set);
+            if (chord == null) {
+                throw new Exception("Couldn't identify the chord");
+            } else {
+                addNoteToPoint(buildNote(NoteType.LEFT_HAND_CHORD, chord, null, Constants.NOTE_NAME_MAP.get(chord)), point, state);
+            }
+        } else if (set.size() == 4) {//can be 7th chord, or a major/minor chord + a bass
+            String chord = getChordName(set);
+            if (chord == null) {//3+1
+                chord = getChordName(set.tailSet((Integer) set.toArray()[1]));
+                if (chord == null) {
+                    throw new Exception("Couldn't identify the chord");
+                } else {
+                    addNoteToPoint(buildNote(NoteType.LEFT_HAND_CHORD, chord, null, Constants.NOTE_NAME_MAP.get(chord)), point, state);
+                    addNoteToPoint(buildNote(NoteType.LEFT_HAND_BASS, null, set.first(), Constants.NOTE_NAME_MAP.get(String.valueOf(set.first()))), point, state);
+                }
+            } else {//4: 7th chord
+                addNoteToPoint(buildNote(NoteType.LEFT_HAND_CHORD, chord, null, Constants.NOTE_NAME_MAP.get(chord)), point, state);
+            }
+        } else if (set.size() == 5) {//4+1: 7th + bass
+            String chord = getChordName(set.tailSet((Integer) set.toArray()[1]));
+            if (chord == null) {
+                throw new Exception("Couldn't identify the chord");
+            } else {
+                addNoteToPoint(buildNote(NoteType.LEFT_HAND_CHORD, chord, null, Constants.NOTE_NAME_MAP.get(chord)), point, state);
+                addNoteToPoint(buildNote(NoteType.LEFT_HAND_BASS, null, set.first(), Constants.NOTE_NAME_MAP.get(String.valueOf(set.first()))), point, state);
+            }
         } else {
-            throw new Exception("Left-hand playing more than 4 notes.");
+            throw new Exception("Left-hand playing more than 5 notes.");
         }
+    }
+
+    private Note buildNote(NoteType type, String chord, Integer noteValue, String noteName) {
+        Note note = new Note();
+        note.setNoteType(type);
+        note.setChordName(chord);
+        note.setNoteValue(noteValue);
+        note.setNoteName(noteName);
+        return note;
     }
 
     private void addNoteToPoint(Note note, Point point, NoteState state) {
@@ -183,7 +196,7 @@ public class PointsHandler {
         }
     }
 
-    public String getChordName(SortedSet<Integer> notesSet, int bar) throws Exception {
+    public String getChordName(SortedSet<Integer> notesSet) {
         StringBuilder stringBuilder = new StringBuilder();
         for (Integer i : notesSet) {
             stringBuilder.append(i);
@@ -191,17 +204,7 @@ public class PointsHandler {
                 stringBuilder.append("_");
             }
         }
-        String chordName = Chord.CHORDS_MAP.get(stringBuilder.toString());
-        if (chordName == null) {
-            StringBuilder noteNames = new StringBuilder();
-            String[] splits = stringBuilder.toString().split("_");
-            for (String split : splits) {
-                noteNames.append(Constants.NOTE_NAME_MAP.get(split));
-                noteNames.append(" ");
-            }
-            throw new Exception("Unidentified chord. Couldn't find chord for : " + noteNames + "(" + stringBuilder + ") in bar: " + bar);
-        }
-        return chordName;
+        return Chord.CHORDS_MAP.get(stringBuilder.toString());
     }
 
     private SortedSet<Integer> setFromNotes(Note[] notes) {
