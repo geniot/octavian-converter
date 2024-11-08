@@ -9,7 +9,6 @@ import io.github.geniot.octavian.converter.model.SvgNote;
 import io.github.geniot.octavian.converter.model.commands.CCommand;
 import io.github.geniot.octavian.converter.model.commands.DCommand;
 import io.github.geniot.octavian.converter.model.commands.MCommand;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -26,7 +25,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -134,6 +132,9 @@ public class SvgHandler {
     }
 
     private float[] getMatrix(String matrixStr) {
+        if (matrixStr == null) {
+            return new float[]{1, 1, 1, 1, 0, 0};
+        }
         matrixStr = matrixStr.replaceAll("matrix", "").replaceAll("[()]", "");
         String[] splits = matrixStr.split(",");
         float[] matrix = new float[6];
@@ -189,7 +190,7 @@ public class SvgHandler {
         for (int i = 0; i < list.getLength(); i++) {
             Node node = list.item(i);
 
-            String matrixStr = node.getAttributes().getNamedItem("transform").getNodeValue();
+            String matrixStr = node.getAttributes().getNamedItem("transform") == null ? null : node.getAttributes().getNamedItem("transform").getNodeValue();
             String dStr = node.getAttributes().getNamedItem("d").getNodeValue();
 
             float[] matrix = getMatrix(matrixStr);
@@ -210,6 +211,11 @@ public class SvgHandler {
 
                 float newX = matrix[0] * command.getX() + matrix[2] * command.getY() + matrix[4];
                 float newY = matrix[1] * command.getX() + matrix[3] * command.getY() + matrix[5];
+
+                if (matrixStr == null) {
+                    newX = command.getX();
+                    newY = command.getY();
+                }
 
                 if (maxX == -1) {
                     maxX = newX;
