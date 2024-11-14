@@ -123,6 +123,7 @@ public class MuseHandler {
 
     private void cleanify(Node node) throws Exception {
         //remove title, author, startRepeat, endRepeat, volta spanners
+        removeByXPath("//Harmony", node, xpath);
         removeByXPath("//startRepeat", node, xpath);
         removeByXPath("//endRepeat", node, xpath);
         removeByXPath("//Spanner[@type='Volta']", node, xpath);

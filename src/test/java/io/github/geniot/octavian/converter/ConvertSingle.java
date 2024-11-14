@@ -17,8 +17,8 @@ public class ConvertSingle {
             MuseConverter museConverter = new MuseConverter();
             museConverter.setMuseScoreRun("xvfb-run -a -e /dev/stdout /opt/musescore/MuseScore-3.6.2.548021370-x86_64.AppImage");
             StringWriter writer = new StringWriter();
-            IOUtils.copy(Thread.currentThread().getContextClassLoader().getResource("Menuet en Sol de J.S._Bach.mscx").openStream(), writer, StandardCharsets.UTF_8);
-            MuseConversionResponse response = museConverter.convert(writer.toString(), 300, "test", "test", Instrument.ACCORDION, false);
+            IOUtils.copy(Thread.currentThread().getContextClassLoader().getResource("Loiz Bonfa - Black Orpheus.mscx").openStream(), writer, StandardCharsets.UTF_8);
+            MuseConversionResponse response = museConverter.convert(writer.toString(), 300, "test", "test", Instrument.PIANO, false);
             System.out.println(response.getTune().getTitle());
         } catch (Exception ex) {
             ex.printStackTrace();
