@@ -58,7 +58,11 @@ public class MuseScoreRoot {
                 }
             }
         }
-        throw new Exception("Couldn't find a note for " + millisecond + ";" + pitch + ";" + messageCommand);
+        if (messageCommand == ShortMessage.NOTE_OFF) {
+            logger.warn("Couldn't find an off-note for " + millisecond + ";" + pitch + ";" + messageCommand);
+        }else{
+            throw new Exception("Couldn't find a on-note for " + millisecond + ";" + pitch + ";" + messageCommand);
+        }
     }
 
     private List<MuseNote> getAudibleNotes() {
