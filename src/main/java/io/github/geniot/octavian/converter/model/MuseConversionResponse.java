@@ -7,4 +7,6 @@ public class MuseConversionResponse {
     byte[] pngSheet;
     byte[] mp3;
     Tune tune;
+    int pngWidth;
+    int pngHeight;
 }

@@ -1,9 +1,12 @@
 package io.github.geniot.octavian.converter;
 
+import com.github.weisj.jsvg.SVGDocument;
+import com.github.weisj.jsvg.parser.SVGLoader;
 import io.github.geniot.octavian.converter.tools.SvgHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
@@ -14,7 +17,11 @@ public class ConvertSvgToPng {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             IOUtils.copy(Thread.currentThread().getContextClassLoader().getResource("score.svg").openStream(), byteArrayOutputStream);
             long t1 = System.currentTimeMillis();
-            byte[] bbs = svgHandler.svg2png(byteArrayOutputStream.toByteArray(), 42852.5f, 539.553f);
+
+            SVGLoader loader = new SVGLoader();
+            SVGDocument svgDocument = loader.load(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+            byte[] bbs = svgHandler.svg2png(svgDocument);
+
             System.out.println(System.currentTimeMillis() - t1);
             FileUtils.writeByteArrayToFile(new File("out.png"), bbs);
         } catch (Exception ex) {

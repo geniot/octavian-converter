@@ -1,6 +1,9 @@
 package io.github.geniot.octavian.converter.tools;
 
 
+import com.github.weisj.jsvg.SVGDocument;
+import com.github.weisj.jsvg.geometry.size.FloatSize;
+import com.github.weisj.jsvg.parser.SVGLoader;
 import io.github.geniot.indexedtreemap.IndexedTreeMap;
 import io.github.geniot.indexedtreemap.IndexedTreeSet;
 import io.github.geniot.octavian.converter.model.*;
@@ -101,7 +104,10 @@ public class MuseConverter {
             pointsHandler.setOffsetsToOffPoints(pointsMap.values().toArray(new Point[0]), newWidth);
             pointsHandler.setBars(pointsMap, barOffsets);
 
-            byte[] pngBytes = svgHandler.svg2png(museHalfConversionResult.getSvgBytes(), newWidth, pngHeight);
+            SVGLoader loader = new SVGLoader();
+            SVGDocument svgDocument = loader.load(new ByteArrayInputStream(museHalfConversionResult.getSvgBytes()));
+            byte[] pngBytes = svgHandler.svg2png(svgDocument);
+            FloatSize size = svgDocument.size();
 
             Tune tune = initTune(
                     Math.round(newWidth),
@@ -114,6 +120,8 @@ public class MuseConverter {
             );
 
             museConversionResponse.setPngSheet(pngBytes);
+            museConversionResponse.setPngHeight((int) size.height);
+            museConversionResponse.setPngWidth((int) size.width);
             museConversionResponse.setTune(tune);
             museConversionResponse.setMp3(museHalfConversionResult.getMp3());
 

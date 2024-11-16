@@ -2,7 +2,6 @@ package io.github.geniot.octavian.converter.tools;
 
 import com.github.weisj.jsvg.SVGDocument;
 import com.github.weisj.jsvg.geometry.size.FloatSize;
-import com.github.weisj.jsvg.parser.SVGLoader;
 import io.github.geniot.indexedtreemap.IndexedTreeSet;
 import io.github.geniot.octavian.converter.model.SvgData;
 import io.github.geniot.octavian.converter.model.SvgNote;
@@ -144,9 +143,7 @@ public class SvgHandler {
         return matrix;
     }
 
-    public byte[] svg2png(byte[] svgBytes, float width, float height) throws Exception {
-        SVGLoader loader = new SVGLoader();
-        SVGDocument svgDocument = loader.load(new ByteArrayInputStream(svgBytes));
+    public byte[] svg2png(SVGDocument svgDocument) throws Exception {
         FloatSize size = svgDocument.size();
         BufferedImage image = new BufferedImage((int) size.width, (int) size.height, BufferedImage.TYPE_4BYTE_ABGR);
         Graphics2D g = image.createGraphics();
