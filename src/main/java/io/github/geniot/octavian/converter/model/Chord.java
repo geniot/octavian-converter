@@ -228,7 +228,7 @@ public class Chord {
 //                put(new String[]{A3, B3, FG4}, B7);
 
                 //dim
-//                put(new String[]{A3, C4, DE4}, Cd);
+                put(new String[]{DE3, A4, C4}, Ad);
 //                put(new String[]{B3, D4, F4}, Dd);//https://www.basicmusictheory.com/d-diminished-7th-chord
 //                put(new String[]{G3, AB3, E4}, Gd);
             }}
