@@ -674,7 +674,7 @@
       <Measure>
         <voice>
           <StaffText>
-            <offset x="-0.717588" y="-4.67227"/>
+            <offset x="-0.820101" y="-4.15971"/>
             <text>A7</text>
             </StaffText>
           <Chord>
@@ -704,11 +704,18 @@
       <Measure>
         <voice>
           <StaffText>
-            <offset x="-2.05027" y="-4.69047"/>
+            <offset x="-1.74273" y="-3.25529"/>
             <text>Adim</text>
             </StaffText>
           <Chord>
             <durationType>half</durationType>
+            <Note>
+              <Accidental>
+                <subtype>accidentalFlat</subtype>
+                </Accidental>
+              <pitch>51</pitch>
+              <tpc>11</tpc>
+              </Note>
             <Note>
               <pitch>57</pitch>
               <tpc>17</tpc>
@@ -716,13 +723,6 @@
             <Note>
               <pitch>60</pitch>
               <tpc>14</tpc>
-              </Note>
-            <Note>
-              <Accidental>
-                <subtype>accidentalFlat</subtype>
-                </Accidental>
-              <pitch>63</pitch>
-              <tpc>11</tpc>
               </Note>
             </Chord>
           </voice>
