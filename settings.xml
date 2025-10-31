@@ -1,0 +1,14 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0">
+    <servers>
+        <server>
+            <id>releases</id>
+            <username>${release.user}</username>
+            <password>${release.pass}</password>
+        </server>
+        <server>
+            <id>Snapshots</id>
+            <username>${snapshot.user}</username>
+            <password>${snapshot.pass}</password>
+        </server>
+    </servers>
+</settings>

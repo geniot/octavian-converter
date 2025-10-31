@@ -42,20 +42,20 @@
           </StaffType>
         <defaultClef>F</defaultClef>
         </Staff>
-      <trackName>Piano</trackName>
-      <Instrument id="piano">
-        <longName>Piano</longName>
-        <shortName>Pno.</shortName>
-        <trackName>Piano</trackName>
-        <minPitchP>21</minPitchP>
-        <maxPitchP>108</maxPitchP>
-        <minPitchA>21</minPitchA>
-        <maxPitchA>108</maxPitchA>
-        <instrumentId>keyboard.piano</instrumentId>
+      <trackName>Accordion</trackName>
+      <Instrument id="accordion">
+        <longName>Accordion</longName>
+        <shortName>Acc.</shortName>
+        <trackName>Accordion</trackName>
+        <minPitchP>36</minPitchP>
+        <maxPitchP>93</maxPitchP>
+        <minPitchA>36</minPitchA>
+        <maxPitchA>93</maxPitchA>
+        <instrumentId>keyboard.accordion</instrumentId>
         <clef staff="2">F</clef>
         <Articulation>
           <velocity>100</velocity>
-          <gateTime>95</gateTime>
+          <gateTime>100</gateTime>
           </Articulation>
         <Articulation name="staccatissimo">
           <velocity>100</velocity>
@@ -94,7 +94,8 @@
           <gateTime>100</gateTime>
           </Articulation>
         <Channel>
-          <program value="0"/>
+          <controller ctrl="32" value="17"/>
+          <program value="21"/>
           <synti>Fluid</synti>
           </Channel>
         </Instrument>
@@ -134,6 +135,9 @@
             <durationType>measure</durationType>
             <duration>2/4</duration>
             </Rest>
+          <BarLine>
+            <subtype>double</subtype>
+            </BarLine>
           </voice>
         </Measure>
       <Measure>
@@ -166,6 +170,9 @@
             <durationType>measure</durationType>
             <duration>2/4</duration>
             </Rest>
+          <BarLine>
+            <subtype>double</subtype>
+            </BarLine>
           </voice>
         </Measure>
       <Measure>
@@ -198,6 +205,9 @@
             <durationType>measure</durationType>
             <duration>2/4</duration>
             </Rest>
+          <BarLine>
+            <subtype>double</subtype>
+            </BarLine>
           </voice>
         </Measure>
       <Measure>
@@ -230,6 +240,9 @@
             <durationType>measure</durationType>
             <duration>2/4</duration>
             </Rest>
+          <BarLine>
+            <subtype>double</subtype>
+            </BarLine>
           </voice>
         </Measure>
       <Measure>
@@ -625,24 +638,24 @@
             <sigD>4</sigD>
             </TimeSig>
           <StaffText>
-            <offset x="-0.307539" y="-3.96723"/>
+            <offset x="4.58356e-15" y="-2.63456"/>
             <text>A</text>
             </StaffText>
           <Chord>
             <durationType>half</durationType>
             <Note>
-              <pitch>57</pitch>
+              <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             <Note>
               <Accidental>
                 <subtype>accidentalSharp</subtype>
                 </Accidental>
-              <pitch>61</pitch>
+              <pitch>49</pitch>
               <tpc>21</tpc>
               </Note>
             <Note>
-              <pitch>64</pitch>
+              <pitch>52</pitch>
               <tpc>18</tpc>
               </Note>
             </Chord>
@@ -651,21 +664,21 @@
       <Measure>
         <voice>
           <StaffText>
-            <offset x="-0.615078" y="-4.10526"/>
+            <offset x="-0.615078" y="-2.56757"/>
             <text>Am</text>
             </StaffText>
           <Chord>
             <durationType>half</durationType>
             <Note>
-              <pitch>57</pitch>
+              <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             <Note>
-              <pitch>60</pitch>
+              <pitch>48</pitch>
               <tpc>14</tpc>
               </Note>
             <Note>
-              <pitch>64</pitch>
+              <pitch>52</pitch>
               <tpc>18</tpc>
               </Note>
             </Chord>
@@ -674,11 +687,375 @@
       <Measure>
         <voice>
           <StaffText>
-            <offset x="-0.820101" y="-4.15971"/>
+            <offset x="-0.717588" y="-2.21196"/>
             <text>A7</text>
             </StaffText>
           <Chord>
             <durationType>half</durationType>
+            <Note>
+              <pitch>45</pitch>
+              <tpc>17</tpc>
+              </Note>
+            <Note>
+              <Accidental>
+                <subtype>accidentalSharp</subtype>
+                </Accidental>
+              <pitch>49</pitch>
+              <tpc>21</tpc>
+              </Note>
+            <Note>
+              <pitch>52</pitch>
+              <tpc>18</tpc>
+              </Note>
+            <Note>
+              <pitch>55</pitch>
+              <tpc>15</tpc>
+              </Note>
+            </Chord>
+          </voice>
+        </Measure>
+      <Measure>
+        <voice>
+          <StaffText>
+            <offset x="-0.717596" y="-2.74272"/>
+            <text>Ad</text>
+            </StaffText>
+          <Chord>
+            <durationType>half</durationType>
+            <Note>
+              <pitch>45</pitch>
+              <tpc>17</tpc>
+              </Note>
+            <Note>
+              <pitch>48</pitch>
+              <tpc>14</tpc>
+              </Note>
+            <Note>
+              <Accidental>
+                <subtype>accidentalFlat</subtype>
+                </Accidental>
+              <pitch>51</pitch>
+              <tpc>11</tpc>
+              </Note>
+            <Note>
+              <Accidental>
+                <subtype>accidentalFlat</subtype>
+                </Accidental>
+              <pitch>54</pitch>
+              <tpc>8</tpc>
+              </Note>
+            </Chord>
+          <BarLine>
+            <subtype>double</subtype>
+            </BarLine>
+          </voice>
+        </Measure>
+      <Measure>
+        <voice>
+          <StaffText>
+            <offset x="4.58356e-15" y="-2.63456"/>
+            <text>B♭</text>
+            </StaffText>
+          <Chord>
+            <durationType>half</durationType>
+            <Note>
+              <Accidental>
+                <subtype>accidentalFlat</subtype>
+                </Accidental>
+              <pitch>46</pitch>
+              <tpc>12</tpc>
+              </Note>
+            <Note>
+              <pitch>50</pitch>
+              <tpc>16</tpc>
+              </Note>
+            <Note>
+              <pitch>53</pitch>
+              <tpc>13</tpc>
+              </Note>
+            </Chord>
+          </voice>
+        </Measure>
+      <Measure>
+        <voice>
+          <StaffText>
+            <offset x="-0.615078" y="-2.56757"/>
+            <text>B♭m</text>
+            </StaffText>
+          <Chord>
+            <durationType>half</durationType>
+            <Note>
+              <Accidental>
+                <subtype>accidentalFlat</subtype>
+                </Accidental>
+              <pitch>46</pitch>
+              <tpc>12</tpc>
+              </Note>
+            <Note>
+              <Accidental>
+                <subtype>accidentalFlat</subtype>
+                </Accidental>
+              <pitch>49</pitch>
+              <tpc>9</tpc>
+              </Note>
+            <Note>
+              <pitch>53</pitch>
+              <tpc>13</tpc>
+              </Note>
+            </Chord>
+          </voice>
+        </Measure>
+      <Measure>
+        <voice>
+          <StaffText>
+            <offset x="-0.922614" y="-2.31447"/>
+            <text>B♭7</text>
+            </StaffText>
+          <Chord>
+            <durationType>half</durationType>
+            <Note>
+              <Accidental>
+                <subtype>accidentalFlat</subtype>
+                </Accidental>
+              <pitch>46</pitch>
+              <tpc>12</tpc>
+              </Note>
+            <Note>
+              <pitch>50</pitch>
+              <tpc>16</tpc>
+              </Note>
+            <Note>
+              <pitch>53</pitch>
+              <tpc>13</tpc>
+              </Note>
+            <Note>
+              <Accidental>
+                <subtype>accidentalFlat</subtype>
+                </Accidental>
+              <pitch>56</pitch>
+              <tpc>10</tpc>
+              </Note>
+            </Chord>
+          </voice>
+        </Measure>
+      <Measure>
+        <voice>
+          <StaffText>
+            <offset x="-1.74272" y="-2.84524"/>
+            <text>B♭d</text>
+            </StaffText>
+          <Chord>
+            <durationType>half</durationType>
+            <Note>
+              <Accidental>
+                <subtype>accidentalFlat</subtype>
+                </Accidental>
+              <pitch>46</pitch>
+              <tpc>12</tpc>
+              </Note>
+            <Note>
+              <Accidental>
+                <subtype>accidentalFlat</subtype>
+                </Accidental>
+              <pitch>49</pitch>
+              <tpc>9</tpc>
+              </Note>
+            <Note>
+              <pitch>52</pitch>
+              <tpc>18</tpc>
+              </Note>
+            <Note>
+              <pitch>55</pitch>
+              <tpc>15</tpc>
+              </Note>
+            </Chord>
+          <BarLine>
+            <subtype>double</subtype>
+            </BarLine>
+          </voice>
+        </Measure>
+      <Measure>
+        <voice>
+          <StaffText>
+            <offset x="4.58356e-15" y="-2.63456"/>
+            <text>B</text>
+            </StaffText>
+          <Chord>
+            <durationType>half</durationType>
+            <Note>
+              <pitch>47</pitch>
+              <tpc>19</tpc>
+              </Note>
+            <Note>
+              <Accidental>
+                <subtype>accidentalFlat</subtype>
+                </Accidental>
+              <pitch>51</pitch>
+              <tpc>11</tpc>
+              </Note>
+            <Note>
+              <Accidental>
+                <subtype>accidentalFlat</subtype>
+                </Accidental>
+              <pitch>54</pitch>
+              <tpc>8</tpc>
+              </Note>
+            </Chord>
+          </voice>
+        </Measure>
+      <Measure>
+        <voice>
+          <StaffText>
+            <offset x="-0.615078" y="-2.56757"/>
+            <text>Bm</text>
+            </StaffText>
+          <Chord>
+            <durationType>half</durationType>
+            <Note>
+              <pitch>47</pitch>
+              <tpc>19</tpc>
+              </Note>
+            <Note>
+              <pitch>50</pitch>
+              <tpc>16</tpc>
+              </Note>
+            <Note>
+              <Accidental>
+                <subtype>accidentalFlat</subtype>
+                </Accidental>
+              <pitch>54</pitch>
+              <tpc>8</tpc>
+              </Note>
+            </Chord>
+          </voice>
+        </Measure>
+      <Measure>
+        <voice>
+          <StaffText>
+            <offset x="-0.717588" y="-2.21196"/>
+            <text>B7</text>
+            </StaffText>
+          <Chord>
+            <durationType>half</durationType>
+            <Note>
+              <pitch>47</pitch>
+              <tpc>19</tpc>
+              </Note>
+            <Note>
+              <Accidental>
+                <subtype>accidentalFlat</subtype>
+                </Accidental>
+              <pitch>51</pitch>
+              <tpc>11</tpc>
+              </Note>
+            <Note>
+              <Accidental>
+                <subtype>accidentalFlat</subtype>
+                </Accidental>
+              <pitch>54</pitch>
+              <tpc>8</tpc>
+              </Note>
+            <Note>
+              <pitch>57</pitch>
+              <tpc>17</tpc>
+              </Note>
+            </Chord>
+          </voice>
+        </Measure>
+      <Measure>
+        <voice>
+          <StaffText>
+            <offset x="-0.717596" y="-2.74272"/>
+            <text>Bd</text>
+            </StaffText>
+          <Chord>
+            <durationType>half</durationType>
+            <Note>
+              <pitch>47</pitch>
+              <tpc>19</tpc>
+              </Note>
+            <Note>
+              <pitch>50</pitch>
+              <tpc>16</tpc>
+              </Note>
+            <Note>
+              <pitch>53</pitch>
+              <tpc>13</tpc>
+              </Note>
+            <Note>
+              <Accidental>
+                <subtype>accidentalFlat</subtype>
+                </Accidental>
+              <pitch>56</pitch>
+              <tpc>10</tpc>
+              </Note>
+            </Chord>
+          <BarLine>
+            <subtype>double</subtype>
+            </BarLine>
+          </voice>
+        </Measure>
+      <Measure>
+        <voice>
+          <StaffText>
+            <offset x="4.58356e-15" y="-2.63456"/>
+            <text>C</text>
+            </StaffText>
+          <Chord>
+            <durationType>half</durationType>
+            <Note>
+              <pitch>48</pitch>
+              <tpc>14</tpc>
+              </Note>
+            <Note>
+              <pitch>52</pitch>
+              <tpc>18</tpc>
+              </Note>
+            <Note>
+              <pitch>55</pitch>
+              <tpc>15</tpc>
+              </Note>
+            </Chord>
+          </voice>
+        </Measure>
+      <Measure>
+        <voice>
+          <StaffText>
+            <offset x="-0.615078" y="-2.56757"/>
+            <text>Cm</text>
+            </StaffText>
+          <Chord>
+            <durationType>half</durationType>
+            <Note>
+              <pitch>48</pitch>
+              <tpc>14</tpc>
+              </Note>
+            <Note>
+              <Accidental>
+                <subtype>accidentalFlat</subtype>
+                </Accidental>
+              <pitch>51</pitch>
+              <tpc>11</tpc>
+              </Note>
+            <Note>
+              <pitch>55</pitch>
+              <tpc>15</tpc>
+              </Note>
+            </Chord>
+          </voice>
+        </Measure>
+      <Measure>
+        <voice>
+          <StaffText>
+            <offset x="-0.717588" y="-2.21196"/>
+            <text>C7</text>
+            </StaffText>
+          <Chord>
+            <durationType>half</durationType>
+            <Note>
+              <pitch>48</pitch>
+              <tpc>14</tpc>
+              </Note>
             <Note>
               <pitch>52</pitch>
               <tpc>18</tpc>
@@ -688,15 +1065,11 @@
               <tpc>15</tpc>
               </Note>
             <Note>
-              <pitch>57</pitch>
-              <tpc>17</tpc>
-              </Note>
-            <Note>
               <Accidental>
-                <subtype>accidentalSharp</subtype>
+                <subtype>accidentalFlat</subtype>
                 </Accidental>
-              <pitch>61</pitch>
-              <tpc>21</tpc>
+              <pitch>58</pitch>
+              <tpc>12</tpc>
               </Note>
             </Chord>
           </voice>
@@ -704,11 +1077,134 @@
       <Measure>
         <voice>
           <StaffText>
-            <offset x="-1.74273" y="-3.25529"/>
-            <text>Adim</text>
+            <offset x="-0.717596" y="-2.74272"/>
+            <text>Cd</text>
             </StaffText>
           <Chord>
             <durationType>half</durationType>
+            <Note>
+              <pitch>48</pitch>
+              <tpc>14</tpc>
+              </Note>
+            <Note>
+              <Accidental>
+                <subtype>accidentalSharp</subtype>
+                </Accidental>
+              <pitch>51</pitch>
+              <tpc>23</tpc>
+              </Note>
+            <Note>
+              <Accidental>
+                <subtype>accidentalSharp</subtype>
+                </Accidental>
+              <pitch>54</pitch>
+              <tpc>20</tpc>
+              </Note>
+            <Note>
+              <pitch>57</pitch>
+              <tpc>17</tpc>
+              </Note>
+            </Chord>
+          <BarLine>
+            <subtype>double</subtype>
+            </BarLine>
+          </voice>
+        </Measure>
+      <Measure>
+        <voice>
+          <StaffText>
+            <offset x="4.58356e-15" y="-2.63456"/>
+            <text>D♭</text>
+            </StaffText>
+          <Chord>
+            <durationType>half</durationType>
+            <Note>
+              <pitch>45</pitch>
+              <tpc>17</tpc>
+              </Note>
+            <Note>
+              <Accidental>
+                <subtype>accidentalSharp</subtype>
+                </Accidental>
+              <pitch>49</pitch>
+              <tpc>21</tpc>
+              </Note>
+            <Note>
+              <pitch>52</pitch>
+              <tpc>18</tpc>
+              </Note>
+            </Chord>
+          </voice>
+        </Measure>
+      <Measure>
+        <voice>
+          <StaffText>
+            <offset x="-0.615078" y="-2.56757"/>
+            <text>D♭m</text>
+            </StaffText>
+          <Chord>
+            <durationType>half</durationType>
+            <Note>
+              <pitch>45</pitch>
+              <tpc>17</tpc>
+              </Note>
+            <Note>
+              <pitch>48</pitch>
+              <tpc>14</tpc>
+              </Note>
+            <Note>
+              <pitch>52</pitch>
+              <tpc>18</tpc>
+              </Note>
+            </Chord>
+          </voice>
+        </Measure>
+      <Measure>
+        <voice>
+          <StaffText>
+            <offset x="-0.717588" y="-2.21196"/>
+            <text>D♭7</text>
+            </StaffText>
+          <Chord>
+            <durationType>half</durationType>
+            <Note>
+              <pitch>45</pitch>
+              <tpc>17</tpc>
+              </Note>
+            <Note>
+              <Accidental>
+                <subtype>accidentalSharp</subtype>
+                </Accidental>
+              <pitch>49</pitch>
+              <tpc>21</tpc>
+              </Note>
+            <Note>
+              <pitch>52</pitch>
+              <tpc>18</tpc>
+              </Note>
+            <Note>
+              <pitch>55</pitch>
+              <tpc>15</tpc>
+              </Note>
+            </Chord>
+          </voice>
+        </Measure>
+      <Measure>
+        <voice>
+          <StaffText>
+            <offset x="-0.717596" y="-2.74272"/>
+            <text>D♭d</text>
+            </StaffText>
+          <Chord>
+            <durationType>half</durationType>
+            <Note>
+              <pitch>45</pitch>
+              <tpc>17</tpc>
+              </Note>
+            <Note>
+              <pitch>48</pitch>
+              <tpc>14</tpc>
+              </Note>
             <Note>
               <Accidental>
                 <subtype>accidentalFlat</subtype>
@@ -717,142 +1213,13 @@
               <tpc>11</tpc>
               </Note>
             <Note>
-              <pitch>57</pitch>
-              <tpc>17</tpc>
-              </Note>
-            <Note>
-              <pitch>60</pitch>
-              <tpc>14</tpc>
+              <Accidental>
+                <subtype>accidentalFlat</subtype>
+                </Accidental>
+              <pitch>54</pitch>
+              <tpc>8</tpc>
               </Note>
             </Chord>
-          </voice>
-        </Measure>
-      <Measure>
-        <voice>
-          <Rest>
-            <durationType>measure</durationType>
-            <duration>2/4</duration>
-            </Rest>
-          </voice>
-        </Measure>
-      <Measure>
-        <voice>
-          <Rest>
-            <durationType>measure</durationType>
-            <duration>2/4</duration>
-            </Rest>
-          </voice>
-        </Measure>
-      <Measure>
-        <voice>
-          <Rest>
-            <durationType>measure</durationType>
-            <duration>2/4</duration>
-            </Rest>
-          </voice>
-        </Measure>
-      <Measure>
-        <voice>
-          <Rest>
-            <durationType>measure</durationType>
-            <duration>2/4</duration>
-            </Rest>
-          </voice>
-        </Measure>
-      <Measure>
-        <voice>
-          <Rest>
-            <durationType>measure</durationType>
-            <duration>2/4</duration>
-            </Rest>
-          </voice>
-        </Measure>
-      <Measure>
-        <voice>
-          <Rest>
-            <durationType>measure</durationType>
-            <duration>2/4</duration>
-            </Rest>
-          </voice>
-        </Measure>
-      <Measure>
-        <voice>
-          <Rest>
-            <durationType>measure</durationType>
-            <duration>2/4</duration>
-            </Rest>
-          </voice>
-        </Measure>
-      <Measure>
-        <voice>
-          <Rest>
-            <durationType>measure</durationType>
-            <duration>2/4</duration>
-            </Rest>
-          </voice>
-        </Measure>
-      <Measure>
-        <voice>
-          <Rest>
-            <durationType>measure</durationType>
-            <duration>2/4</duration>
-            </Rest>
-          </voice>
-        </Measure>
-      <Measure>
-        <voice>
-          <Rest>
-            <durationType>measure</durationType>
-            <duration>2/4</duration>
-            </Rest>
-          </voice>
-        </Measure>
-      <Measure>
-        <voice>
-          <Rest>
-            <durationType>measure</durationType>
-            <duration>2/4</duration>
-            </Rest>
-          </voice>
-        </Measure>
-      <Measure>
-        <voice>
-          <Rest>
-            <durationType>measure</durationType>
-            <duration>2/4</duration>
-            </Rest>
-          </voice>
-        </Measure>
-      <Measure>
-        <voice>
-          <Rest>
-            <durationType>measure</durationType>
-            <duration>2/4</duration>
-            </Rest>
-          </voice>
-        </Measure>
-      <Measure>
-        <voice>
-          <Rest>
-            <durationType>measure</durationType>
-            <duration>2/4</duration>
-            </Rest>
-          </voice>
-        </Measure>
-      <Measure>
-        <voice>
-          <Rest>
-            <durationType>measure</durationType>
-            <duration>2/4</duration>
-            </Rest>
-          </voice>
-        </Measure>
-      <Measure>
-        <voice>
-          <Rest>
-            <durationType>measure</durationType>
-            <duration>2/4</duration>
-            </Rest>
           </voice>
         </Measure>
       <Measure>
