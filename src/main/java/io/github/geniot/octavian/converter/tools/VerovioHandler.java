@@ -64,11 +64,24 @@ public class VerovioHandler {
         removeByXPath("//tempo/text()", document, xpath);
         removeByXPath("//tempo/rend/text()", document, xpath);
         removeByXPath("//dir/text()", document, xpath);
+        removeByXPath("//measure/mNum", document, xpath);//we will add our own measure numbers
         removeAttributeByXPath("//measure", document, xpath, "left");
         removeAttributeByXPath("//measure", document, xpath, "right");
         replaceEndingsWithSections(document, xpath);
         addRightEndToLastMeasure(document, xpath);
+        addMeasureNumbers(document, xpath);
         return document2string(document);
+    }
+
+    private void addMeasureNumbers(Document document, XPath xpath) throws Exception {
+        NodeList searchResultsList = (NodeList) xpath.compile("//measure").evaluate(document, XPathConstants.NODESET);
+        for (int i = 0; i < searchResultsList.getLength(); i++) {
+            Node n = searchResultsList.item(i);
+            Node firstChild = n.getFirstChild();
+            Element pageChild = document.createElement("mNum");
+            pageChild.setTextContent(String.valueOf(i + 1));
+            n.insertBefore(pageChild, firstChild);
+        }
     }
 
     private void addRightEndToLastMeasure(Document document, XPath xpath) throws Exception {

@@ -37,11 +37,11 @@ public class VerovioConverter {
         String meiExpandedCorrected = verovioHandler.fixXml(meiExpanded);
         IOUtils.write(meiExpandedCorrected, new FileOutputStream("tmp/out.mei"), StandardCharsets.UTF_8);
 
-        String svg = new String(runProcess((new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "svg", "--input-from", "mei"))), meiExpandedCorrected, ".svg", "--outfile"), StandardCharsets.UTF_8);
+        String svg = new String(runProcess((new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--spacing-linear", "0.50", "--expand-always", "--breaks", "none", "--output-to", "svg", "--input-from", "mei"))), meiExpandedCorrected, ".svg", "--outfile"), StandardCharsets.UTF_8);
 //        String svgCorrected = verovioHandler.fixSvg(svg);
         IOUtils.write(svg, new FileOutputStream("tmp/out.svg"), StandardCharsets.UTF_8);
 
-        byte[] pngBytes = runProcess((new ArrayList<>(Arrays.asList("rsvg-convert"))), svg, ".png", "-o");
+        byte[] pngBytes = runProcess((new ArrayList<>(List.of("rsvg-convert"))), svg, ".png", "-o");
         IOUtils.write(pngBytes, new FileOutputStream("tmp/out.png"));
 
         return null;
