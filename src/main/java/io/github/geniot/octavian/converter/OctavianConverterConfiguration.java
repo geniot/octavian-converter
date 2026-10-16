@@ -5,6 +5,8 @@ import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -15,4 +17,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Getter
 public class OctavianConverterConfiguration implements WebMvcConfigurer {
     Logger logger = LoggerFactory.getLogger(OctavianConverterConfiguration.class);
+
+    @Bean
+    ConcurrentMapCacheManager cacheManager() {
+        return new ConcurrentMapCacheManager();
+    }
 }
