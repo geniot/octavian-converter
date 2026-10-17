@@ -4,12 +4,19 @@ import com.zaxxer.nuprocess.NuProcess;
 import com.zaxxer.nuprocess.NuProcessBuilder;
 import io.github.geniot.octavian.converter.model.Instrument;
 import io.github.geniot.octavian.converter.model.MuseConversionResponse;
+import io.sf.carte.echosvg.transcoder.TranscoderException;
+import io.sf.carte.echosvg.transcoder.TranscoderInput;
+import io.sf.carte.echosvg.transcoder.TranscoderOutput;
+import io.sf.carte.echosvg.transcoder.image.PNGTranscoder;
 import lombok.Data;
 import org.apache.commons.io.IOUtils;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class VerovioConverter {
 
     VerovioHandler verovioHandler = new VerovioHandler();
+    SvgHandler svgHandler = new SvgHandler();
 
 
     public MuseConversionResponse convert(String musixXml,
@@ -38,13 +46,67 @@ public class VerovioConverter {
         IOUtils.write(meiExpandedCorrected, new FileOutputStream("tmp/out.mei"), StandardCharsets.UTF_8);
 
         String svg = new String(runProcess((new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--spacing-linear", "0.50", "--expand-always", "--breaks", "none", "--output-to", "svg", "--input-from", "mei"))), meiExpandedCorrected, ".svg", "--outfile"), StandardCharsets.UTF_8);
-//        String svgCorrected = verovioHandler.fixSvg(svg);
+        svg = verovioHandler.fixSvg(svg);
         IOUtils.write(svg, new FileOutputStream("tmp/out.svg"), StandardCharsets.UTF_8);
 
-        byte[] pngBytes = runProcess((new ArrayList<>(List.of("rsvg-convert"))), svg, ".png", "-o");
+        byte[] pngBytes = getPngBytes(svg);
+        BufferedImage image = ImageIO.read(new ByteArrayInputStream(pngBytes));
+        image = crop(image);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", baos);
+        pngBytes = baos.toByteArray();
+//        byte[] pngBytes = JairoSVG.svg2png(svg.getBytes(StandardCharsets.UTF_8));
+//        byte[] pngBytes = runProcess((new ArrayList<>(List.of("rsvg-convert"))), svg, ".png", "-o");
         IOUtils.write(pngBytes, new FileOutputStream("tmp/out.png"));
 
         return null;
+    }
+
+    private static byte @NonNull [] getPngBytes(String svg) throws TranscoderException, IOException {
+        long time = System.currentTimeMillis();
+        PNGTranscoder pngTranscode = new PNGTranscoder();
+        InputStream in = new ByteArrayInputStream(svg.trim().getBytes(StandardCharsets.UTF_8));
+        TranscoderInput tIn = new TranscoderInput(in);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        TranscoderOutput tOut = new TranscoderOutput(os);
+        pngTranscode.transcode(tIn, tOut);
+        os.flush();
+        os.close();
+        byte[] bbs = os.toByteArray();
+        System.out.println(System.currentTimeMillis() - time);
+        return bbs;
+    }
+
+    public static BufferedImage crop(BufferedImage image) {
+        int minY = 0, maxY = 0, minX = Integer.MAX_VALUE, maxX = 0;
+        boolean isBlank, minYIsDefined = false;
+        Raster raster = image.getRaster();
+
+        for (int y = 0; y < image.getHeight(); y++) {
+            isBlank = true;
+
+            for (int x = 0; x < image.getWidth(); x++) {
+                //Change condition to (raster.getSample(x, y, 3) != 0)
+                //for better performance
+                if (raster.getPixel(x, y, (int[]) null)[3] != 0) {
+                    isBlank = false;
+
+                    if (x < minX) minX = x;
+                    if (x > maxX) maxX = x;
+                }
+            }
+
+            if (!isBlank) {
+                if (!minYIsDefined) {
+                    minY = y;
+                    minYIsDefined = true;
+                } else {
+                    if (y > maxY) maxY = y;
+                }
+            }
+        }
+
+        return image.getSubimage(minX, minY, maxX - minX + 1, maxY - minY + 1);
     }
 
     private byte[] runProcess(List<String> commandLine, String input, String outExtension, String outArgName) throws InterruptedException {
