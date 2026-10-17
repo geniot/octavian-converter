@@ -9,6 +9,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -18,6 +19,8 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
+import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -150,5 +153,45 @@ public class VerovioHandler {
             prev = prev.getPreviousSibling();
         }
         return prev;
+    }
+
+    public static byte[] crop(byte[] bbs) throws Exception {
+        BufferedImage image = ImageIO.read(new ByteArrayInputStream(bbs));
+        image = crop(image);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", baos);
+        return baos.toByteArray();
+    }
+
+    public static BufferedImage crop(BufferedImage image) {
+        int minY = 0, maxY = 0, minX = Integer.MAX_VALUE, maxX = 0;
+        boolean isBlank, minYIsDefined = false;
+        Raster raster = image.getRaster();
+
+        for (int y = 0; y < image.getHeight(); y++) {
+            isBlank = true;
+
+            for (int x = 0; x < image.getWidth(); x++) {
+                //Change condition to (raster.getSample(x, y, 3) != 0)
+                //for better performance
+                if (raster.getPixel(x, y, (int[]) null)[3] != 0) {
+                    isBlank = false;
+
+                    if (x < minX) minX = x;
+                    if (x > maxX) maxX = x;
+                }
+            }
+
+            if (!isBlank) {
+                if (!minYIsDefined) {
+                    minY = y;
+                    minYIsDefined = true;
+                } else {
+                    if (y > maxY) maxY = y;
+                }
+            }
+        }
+
+        return image.getSubimage(minX, minY, maxX - minX + 1, maxY - minY + 1);
     }
 }

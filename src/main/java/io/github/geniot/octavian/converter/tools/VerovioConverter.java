@@ -14,9 +14,6 @@ import org.apache.commons.io.IOUtils;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -25,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static io.github.geniot.octavian.converter.tools.VerovioHandler.crop;
 
 
 @Data
@@ -45,17 +44,25 @@ public class VerovioConverter {
 
         IOUtils.write(musicXml, new FileOutputStream("tmp/out.xml"), StandardCharsets.UTF_8);
 
-        String meiExpanded = new String(runProcess((new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "mei", "--input-from", "xml"))), musicXml, ".mei", "--outfile"), StandardCharsets.UTF_8);
+        List<String> args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "mei", "--input-from", "xml"));
+        String meiExpanded = new String(runProcess(args, musicXml.getBytes(StandardCharsets.UTF_8), ".mei", "--outfile", true), StandardCharsets.UTF_8);
         String meiExpandedCorrected = verovioHandler.fixXml(meiExpanded);
         IOUtils.write(meiExpandedCorrected, new FileOutputStream("tmp/out.mei"), StandardCharsets.UTF_8);
 
-        byte[] midBbs = runProcess((new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "midi", "--input-from", "xml"))), musicXml, ".mid", "--outfile");
+        args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "midi", "--input-from", "xml"));
+        byte[] midBbs = runProcess(args, musicXml.getBytes(StandardCharsets.UTF_8), ".mid", "--outfile", true);
         IOUtils.write(midBbs, new FileOutputStream("tmp/out.mid"));
 
-//        byte[] wavBbs = runProcess((new ArrayList<>(Arrays.asList("timidity", "--input-from", "xml"))), musicXml, ".mid", "--outfile");
-//        IOUtils.write(midBbs, new FileOutputStream("tmp/out.mid"));
+        args = new ArrayList<>(List.of("timidity", "-Ow"));
+        byte[] wavBbs = runProcess(args, midBbs, ".wav", "-o", true);
+        IOUtils.write(wavBbs, new FileOutputStream("tmp/out.wav"));
 
-        String svg = new String(runProcess((new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--spacing-linear", "0.40", "--expand-always", "--breaks", "none", "--output-to", "svg", "--input-from", "mei"))), meiExpandedCorrected, ".svg", "--outfile"), StandardCharsets.UTF_8);
+        args = new ArrayList<>(List.of("lame"));
+        byte[] mp3Bbs = runProcess(args, wavBbs, ".mp3", "", false);
+        IOUtils.write(mp3Bbs, new FileOutputStream("tmp/out.mp3"));
+
+        args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--spacing-linear", "0.40", "--expand-always", "--breaks", "none", "--output-to", "svg", "--input-from", "mei"));
+        String svg = new String(runProcess(args, meiExpandedCorrected.getBytes(StandardCharsets.UTF_8), ".svg", "--outfile", true), StandardCharsets.UTF_8);
         svg = verovioHandler.fixSvg(svg);
         IOUtils.write(svg, new FileOutputStream("tmp/out.svg"), StandardCharsets.UTF_8);
 
@@ -85,57 +92,24 @@ public class VerovioConverter {
         return bbs;
     }
 
-    public static byte[] crop(byte[] bbs) throws Exception {
-        BufferedImage image = ImageIO.read(new ByteArrayInputStream(bbs));
-        image = crop(image);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(image, "png", baos);
-        return baos.toByteArray();
-    }
 
-    public static BufferedImage crop(BufferedImage image) {
-        int minY = 0, maxY = 0, minX = Integer.MAX_VALUE, maxX = 0;
-        boolean isBlank, minYIsDefined = false;
-        Raster raster = image.getRaster();
-
-        for (int y = 0; y < image.getHeight(); y++) {
-            isBlank = true;
-
-            for (int x = 0; x < image.getWidth(); x++) {
-                //Change condition to (raster.getSample(x, y, 3) != 0)
-                //for better performance
-                if (raster.getPixel(x, y, (int[]) null)[3] != 0) {
-                    isBlank = false;
-
-                    if (x < minX) minX = x;
-                    if (x > maxX) maxX = x;
-                }
-            }
-
-            if (!isBlank) {
-                if (!minYIsDefined) {
-                    minY = y;
-                    minYIsDefined = true;
-                } else {
-                    if (y > maxY) maxY = y;
-                }
-            }
-        }
-
-        return image.getSubimage(minX, minY, maxX - minX + 1, maxY - minY + 1);
-    }
-
-    private byte[] runProcess(List<String> commandLine, String input, String outExtension, String outArgName) throws InterruptedException {
+    private byte[] runProcess(List<String> commandLine, byte[] input, String outExtension, String outArgName, boolean isOutputFirst) throws InterruptedException {
         try {
             Path tempInputFile = Files.createTempFile("octavian-" + System.currentTimeMillis() + "-input-", String.valueOf(input.hashCode()));
             Path tempOutputFile = Files.createTempFile("octavian-" + System.currentTimeMillis() + "-output-", input.hashCode() + outExtension);
             tempInputFile.toFile().deleteOnExit();
             tempOutputFile.toFile().deleteOnExit();
-            Files.write(tempInputFile, input.getBytes());
+            Files.write(tempInputFile, input);
 
-            commandLine.add(outArgName);
-            commandLine.add(tempOutputFile.toString());
-            commandLine.add(tempInputFile.toString());
+            if (isOutputFirst) {
+                commandLine.add(outArgName);
+                commandLine.add(tempOutputFile.toString());
+                commandLine.add(tempInputFile.toString());
+            } else {
+                commandLine.add(tempInputFile.toString());
+                commandLine.add(outArgName);
+                commandLine.add(tempOutputFile.toString());
+            }
 
             NuProcessBuilder pb = new NuProcessBuilder(commandLine);
             VerovioProcessHandler handler = new VerovioProcessHandler();
