@@ -7,6 +7,7 @@ import io.github.geniot.octavian.converter.model.MuseConversionResponse;
 import io.sf.carte.echosvg.transcoder.TranscoderException;
 import io.sf.carte.echosvg.transcoder.TranscoderInput;
 import io.sf.carte.echosvg.transcoder.TranscoderOutput;
+import io.sf.carte.echosvg.transcoder.TranscodingHints;
 import io.sf.carte.echosvg.transcoder.image.PNGTranscoder;
 import lombok.Data;
 import org.apache.commons.io.IOUtils;
@@ -34,27 +35,31 @@ public class VerovioConverter {
     SvgHandler svgHandler = new SvgHandler();
 
 
-    public MuseConversionResponse convert(String musixXml,
+    public MuseConversionResponse convert(String musicXml,
                                           int pngHeight,
                                           String author,
                                           String title,
                                           Instrument instrument) throws Exception {
-        IOUtils.write(musixXml, new FileOutputStream("tmp/out.xml"), StandardCharsets.UTF_8);
+//        byte[] mp3Bbs = runProcess((new ArrayList<>(Arrays.asList("xvfb-run", "-a", "-e", "/dev/stdout", "/opt/musescore/MuseScore-Studio-4.7.5.260831071-x86_64.AppImage", "mp3"))), musicXml, ".mp3", "--export-to");
+//        IOUtils.write(mp3Bbs, new FileOutputStream("tmp/out.mp3"));
 
-        String meiExpanded = new String(runProcess((new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "mei", "--input-from", "xml"))), musixXml, ".mei", "--outfile"), StandardCharsets.UTF_8);
+        IOUtils.write(musicXml, new FileOutputStream("tmp/out.xml"), StandardCharsets.UTF_8);
+
+        String meiExpanded = new String(runProcess((new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "mei", "--input-from", "xml"))), musicXml, ".mei", "--outfile"), StandardCharsets.UTF_8);
         String meiExpandedCorrected = verovioHandler.fixXml(meiExpanded);
         IOUtils.write(meiExpandedCorrected, new FileOutputStream("tmp/out.mei"), StandardCharsets.UTF_8);
 
-        String svg = new String(runProcess((new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--spacing-linear", "0.50", "--expand-always", "--breaks", "none", "--output-to", "svg", "--input-from", "mei"))), meiExpandedCorrected, ".svg", "--outfile"), StandardCharsets.UTF_8);
+        byte[] midBbs = runProcess((new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "midi", "--input-from", "xml"))), musicXml, ".mid", "--outfile");
+        IOUtils.write(midBbs, new FileOutputStream("tmp/out.mid"));
+
+//        byte[] wavBbs = runProcess((new ArrayList<>(Arrays.asList("timidity", "--input-from", "xml"))), musicXml, ".mid", "--outfile");
+//        IOUtils.write(midBbs, new FileOutputStream("tmp/out.mid"));
+
+        String svg = new String(runProcess((new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--spacing-linear", "0.40", "--expand-always", "--breaks", "none", "--output-to", "svg", "--input-from", "mei"))), meiExpandedCorrected, ".svg", "--outfile"), StandardCharsets.UTF_8);
         svg = verovioHandler.fixSvg(svg);
         IOUtils.write(svg, new FileOutputStream("tmp/out.svg"), StandardCharsets.UTF_8);
 
-        byte[] pngBytes = getPngBytes(svg);
-        BufferedImage image = ImageIO.read(new ByteArrayInputStream(pngBytes));
-        image = crop(image);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(image, "png", baos);
-        pngBytes = baos.toByteArray();
+        byte[] pngBytes = crop(getPngBytes(svg));
 //        byte[] pngBytes = JairoSVG.svg2png(svg.getBytes(StandardCharsets.UTF_8));
 //        byte[] pngBytes = runProcess((new ArrayList<>(List.of("rsvg-convert"))), svg, ".png", "-o");
         IOUtils.write(pngBytes, new FileOutputStream("tmp/out.png"));
@@ -65,6 +70,9 @@ public class VerovioConverter {
     private static byte @NonNull [] getPngBytes(String svg) throws TranscoderException, IOException {
         long time = System.currentTimeMillis();
         PNGTranscoder pngTranscode = new PNGTranscoder();
+        TranscodingHints hints = new TranscodingHints();
+        hints.put(PNGTranscoder.KEY_HEIGHT, 1000F);
+        pngTranscode.setTranscodingHints(hints);
         InputStream in = new ByteArrayInputStream(svg.trim().getBytes(StandardCharsets.UTF_8));
         TranscoderInput tIn = new TranscoderInput(in);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -75,6 +83,14 @@ public class VerovioConverter {
         byte[] bbs = os.toByteArray();
         System.out.println(System.currentTimeMillis() - time);
         return bbs;
+    }
+
+    public static byte[] crop(byte[] bbs) throws Exception {
+        BufferedImage image = ImageIO.read(new ByteArrayInputStream(bbs));
+        image = crop(image);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", baos);
+        return baos.toByteArray();
     }
 
     public static BufferedImage crop(BufferedImage image) {

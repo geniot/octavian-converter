@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 public class ConvertVerovio {
     public static void main(String[] args) {
         try {
-            String path = "/home/vitaly/IdeaProjects/octavian-data/piano/arabesque_etude_no_2_op_100/arabesque_etude_no_2_op_100.xml";
+            String path = "/home/vitaly/IdeaProjects/octavian-data/piano/greensleeves/greensleeves.xml";
             VerovioConverter museConverter = new VerovioConverter();
             String xml = IOUtils.toString(new FileInputStream(path), StandardCharsets.UTF_8);
             MuseConversionResponse response = museConverter.convert(xml, 300, "test", "test", Instrument.ACCORDION);
