@@ -34,49 +34,45 @@ public class VerovioConverter {
     SvgHandler svgHandler = new SvgHandler();
 
 
-    public MuseConversionResponse convert(String musicXml,
+    public MuseConversionResponse convert(String xml,
                                           int pngHeight,
                                           String author,
                                           String title,
                                           Instrument instrument) throws Exception {
-        //MusicXML
-        IOUtils.write(musicXml, new FileOutputStream("tmp/out.xml"), StandardCharsets.UTF_8);
+        List<String> args;
+        //XML
+        IOUtils.write(xml, new FileOutputStream("tmp/out.xml"), StandardCharsets.UTF_8);
 
-        //MEI
-        List<String> args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "mei", "--input-from", "xml"));
-        String meiExpanded = new String(runProcess(args, musicXml.getBytes(StandardCharsets.UTF_8), ".mei", "--outfile", true, true), StandardCharsets.UTF_8);
-        String meiExpandedCorrected = verovioHandler.fixXml(meiExpanded);
-        IOUtils.write(meiExpandedCorrected, new FileOutputStream("tmp/out.mei"), StandardCharsets.UTF_8);
+        //XML->JSON
+        args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "timemap", "--input-from", "xml"));
+        byte[] json = runProcess(args, xml.getBytes(StandardCharsets.UTF_8), ".xml", ".json", "--outfile", true, true);
+        IOUtils.write(new String(json, StandardCharsets.UTF_8), new FileOutputStream("tmp/out.json"), StandardCharsets.UTF_8);
 
-        //TIMEMAP
-        args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "timemap", "--input-from", "mei"));
-        byte[] timemapBbs = runProcess(args, meiExpandedCorrected.getBytes(StandardCharsets.UTF_8), ".json", "--outfile", true, true);
-        IOUtils.write(new String(timemapBbs, StandardCharsets.UTF_8), new FileOutputStream("tmp/out.json"), StandardCharsets.UTF_8);
+        //XML->MIDI
+        args = new ArrayList<>(List.of("/opt/musescore/musescore"));
+        byte[] midi = runProcess(args, xml.getBytes(StandardCharsets.UTF_8), ".xml", ".mid", "-o", true, true);
+        IOUtils.write(midi, new FileOutputStream("tmp/out.mid"));
 
-        //MIDI
-        args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "midi", "--input-from", "mei"));
-        byte[] midBbs = runProcess(args, meiExpandedCorrected.getBytes(StandardCharsets.UTF_8), ".mid", "--outfile", true, true);
-        IOUtils.write(midBbs, new FileOutputStream("tmp/out.mid"));
+        //XML->MP3
+        args = new ArrayList<>(List.of("/opt/musescore/musescore"));
+        byte[] mp3 = runProcess(args, xml.getBytes(StandardCharsets.UTF_8), ".xml", ".mp3", "-o", true, false);
+        IOUtils.write(mp3, new FileOutputStream("tmp/out.mp3"));
 
-        //WAV
-        args = new ArrayList<>(List.of("timidity", "-Ow"));
-        byte[] wavBbs = runProcess(args, midBbs, ".wav", "-o", true, false);
-        IOUtils.write(wavBbs, new FileOutputStream("tmp/out.wav"));
+        //XML->MEI
+        args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "mei", "--input-from", "xml"));
+        String mei = new String(runProcess(args, xml.getBytes(StandardCharsets.UTF_8), ".xml", ".mei", "--outfile", true, true), StandardCharsets.UTF_8);
+        mei = verovioHandler.fixXml(mei);
+        IOUtils.write(mei, new FileOutputStream("tmp/out.mei"), StandardCharsets.UTF_8);
 
-        //MP3
-        args = new ArrayList<>(List.of("lame"));
-        byte[] mp3Bbs = runProcess(args, wavBbs, ".mp3", "", false, false);
-        IOUtils.write(mp3Bbs, new FileOutputStream("tmp/out.mp3"));
-
-        //SVG
+        //MEI->SVG
         args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--spacing-linear", "0.40", "--expand-always", "--breaks", "none", "--output-to", "svg", "--input-from", "mei"));
-        String svg = new String(runProcess(args, meiExpandedCorrected.getBytes(StandardCharsets.UTF_8), ".svg", "--outfile", true, true), StandardCharsets.UTF_8);
+        String svg = new String(runProcess(args, mei.getBytes(StandardCharsets.UTF_8), ".mei", ".svg", "--outfile", true, true), StandardCharsets.UTF_8);
         svg = verovioHandler.fixSvg(svg);
         IOUtils.write(svg, new FileOutputStream("tmp/out.svg"), StandardCharsets.UTF_8);
 
-        //PNG
-        byte[] pngBytes = crop(getPngBytes(svg));
-        IOUtils.write(pngBytes, new FileOutputStream("tmp/out.png"));
+        //SVG->PNG
+        byte[] png = crop(getPngBytes(svg));
+        IOUtils.write(png, new FileOutputStream("tmp/out.png"));
 
         return null;
     }
@@ -100,9 +96,9 @@ public class VerovioConverter {
     }
 
 
-    private byte[] runProcess(List<String> commandLine, byte[] input, String outExtension, String outArgName, boolean isOutputFirst, boolean verbose) throws InterruptedException {
+    private byte[] runProcess(List<String> commandLine, byte[] input, String inExtension, String outExtension, String outArgName, boolean isOutputFirst, boolean verbose) throws InterruptedException {
         try {
-            Path tempInputFile = Files.createTempFile("octavian-" + System.currentTimeMillis() + "-input-", String.valueOf(input.hashCode()));
+            Path tempInputFile = Files.createTempFile("octavian-" + System.currentTimeMillis() + "-input-", String.valueOf(input.hashCode() + inExtension));
             Path tempOutputFile = Files.createTempFile("octavian-" + System.currentTimeMillis() + "-output-", input.hashCode() + outExtension);
             tempInputFile.toFile().deleteOnExit();
             tempOutputFile.toFile().deleteOnExit();
