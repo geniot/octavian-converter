@@ -137,19 +137,24 @@ public class VerovioHandler {
             Element newSection = node.createElement("section");
             newSection.setAttribute("xml:id", n.getAttributes().getNamedItem("xml:id").getNodeValue());
             NodeList children = n.getChildNodes();
+            Node[] childrenArray = new Node[children.getLength()];
             for (int j = 0; j < children.getLength(); j++) {
-                Node child = children.item(j);
+                childrenArray[j] = children.item(j);
+            }
+            for (Node child : childrenArray) {
                 newSection.appendChild(child);
             }
-            Node previousSection = getPreviousSection(n);
-            previousSection.appendChild(newSection);
+            Node previousSectionOrMeasure = getPreviousSectionOrMeasure(n);
+            previousSectionOrMeasure.appendChild(newSection);
             n.getParentNode().removeChild(n);
         }
     }
 
-    private Node getPreviousSection(Node n) {
+    private Node getPreviousSectionOrMeasure(Node n) {
         Node prev = n.getPreviousSibling();
-        while (prev != null && !prev.getNodeName().equalsIgnoreCase("section")) {
+        while (prev != null &&
+                !prev.getNodeName().equalsIgnoreCase("section") &&
+                !prev.getNodeName().equalsIgnoreCase("measure")) {
             prev = prev.getPreviousSibling();
         }
         return prev;
