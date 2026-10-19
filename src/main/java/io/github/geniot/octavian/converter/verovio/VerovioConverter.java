@@ -1,4 +1,4 @@
-package io.github.geniot.octavian.converter.tools;
+package io.github.geniot.octavian.converter.verovio;
 
 import com.zaxxer.nuprocess.NuProcess;
 import com.zaxxer.nuprocess.NuProcessBuilder;
@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static io.github.geniot.octavian.converter.tools.VerovioHandler.crop;
+import static io.github.geniot.octavian.converter.verovio.VerovioHandler.crop;
 
 
 @Data
@@ -32,7 +32,6 @@ import static io.github.geniot.octavian.converter.tools.VerovioHandler.crop;
 public class VerovioConverter {
 
     VerovioHandler verovioHandler = new VerovioHandler();
-    SvgHandler svgHandler = new SvgHandler();
 
 
     public MuseConversionResponse convert(String xml,
@@ -44,11 +43,6 @@ public class VerovioConverter {
         List<String> args;
         //XML
         IOUtils.write(xml, new FileOutputStream("tmp/out.xml"), StandardCharsets.UTF_8);
-
-        //XML->JSON
-//        args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "timemap", "--input-from", "xml"));
-//        byte[] json = runProcess(args, xml.getBytes(StandardCharsets.UTF_8), ".xml", ".json", "--outfile", true, true);
-//        IOUtils.write(new String(json, StandardCharsets.UTF_8), new FileOutputStream("tmp/out.json"), StandardCharsets.UTF_8);
 
         //XML->MIDI
         args = new ArrayList<>(List.of("/opt/musescore/musescore"));

@@ -2,7 +2,7 @@ package io.github.geniot.octavian.converter;
 
 import io.github.geniot.octavian.converter.model.Instrument;
 import io.github.geniot.octavian.converter.model.MuseConversionResponse;
-import io.github.geniot.octavian.converter.tools.VerovioConverter;
+import io.github.geniot.octavian.converter.verovio.VerovioConverter;
 import org.apache.commons.io.IOUtils;
 
 import java.io.FileInputStream;

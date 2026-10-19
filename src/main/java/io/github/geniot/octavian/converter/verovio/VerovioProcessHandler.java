@@ -1,4 +1,4 @@
-package io.github.geniot.octavian.converter.tools;
+package io.github.geniot.octavian.converter.verovio;
 
 import com.zaxxer.nuprocess.NuAbstractProcessHandler;
 import com.zaxxer.nuprocess.NuProcess;

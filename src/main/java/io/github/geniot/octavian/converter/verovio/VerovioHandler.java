@@ -1,4 +1,4 @@
-package io.github.geniot.octavian.converter.tools;
+package io.github.geniot.octavian.converter.verovio;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -57,6 +57,11 @@ public class VerovioHandler {
         removeByXPath("//g[@class='section placeholder systemMilestone']", document, xpath);
         removeByXPath("//g[@class='sb placeholder']", document, xpath);
         removeByXPath("//g[@class='pb placeholder']", document, xpath);
+        removeByXPath("//g[@class='pgHead']", document, xpath);
+        removeByXPath("//g[@class='mdiv pageMilestone']", document, xpath);
+        removeByXPath("//g[@class='score pageMilestone']", document, xpath);
+        removeByXPath("//g[contains(@class, 'pageMilestoneEnd')]", document, xpath);
+        removeByXPath("//g[contains(@class, 'systemMilestoneEnd')]", document, xpath);
         fixMeasureNumberFont(document, xpath);
         return document2string(document);
     }

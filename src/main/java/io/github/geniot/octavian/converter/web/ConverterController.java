@@ -3,7 +3,7 @@ package io.github.geniot.octavian.converter.web;
 import io.github.geniot.octavian.converter.model.MuseConversionRequest;
 import io.github.geniot.octavian.converter.model.MuseConversionResponse;
 import io.github.geniot.octavian.converter.tools.MuseConverter;
-import io.github.geniot.octavian.converter.tools.VerovioConverter;
+import io.github.geniot.octavian.converter.verovio.VerovioConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
