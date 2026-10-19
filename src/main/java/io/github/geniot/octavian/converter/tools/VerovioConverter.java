@@ -11,6 +11,7 @@ import io.sf.carte.echosvg.transcoder.TranscodingHints;
 import io.sf.carte.echosvg.transcoder.image.PNGTranscoder;
 import lombok.Data;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -39,19 +40,25 @@ public class VerovioConverter {
                                           String author,
                                           String title,
                                           Instrument instrument) throws Exception {
+        MuseConversionResponse response = new MuseConversionResponse();
         List<String> args;
         //XML
         IOUtils.write(xml, new FileOutputStream("tmp/out.xml"), StandardCharsets.UTF_8);
 
         //XML->JSON
-        args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "timemap", "--input-from", "xml"));
-        byte[] json = runProcess(args, xml.getBytes(StandardCharsets.UTF_8), ".xml", ".json", "--outfile", true, true);
-        IOUtils.write(new String(json, StandardCharsets.UTF_8), new FileOutputStream("tmp/out.json"), StandardCharsets.UTF_8);
+//        args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "timemap", "--input-from", "xml"));
+//        byte[] json = runProcess(args, xml.getBytes(StandardCharsets.UTF_8), ".xml", ".json", "--outfile", true, true);
+//        IOUtils.write(new String(json, StandardCharsets.UTF_8), new FileOutputStream("tmp/out.json"), StandardCharsets.UTF_8);
 
         //XML->MIDI
         args = new ArrayList<>(List.of("/opt/musescore/musescore"));
         byte[] midi = runProcess(args, xml.getBytes(StandardCharsets.UTF_8), ".xml", ".mid", "-o", true, true);
         IOUtils.write(midi, new FileOutputStream("tmp/out.mid"));
+
+        //MIDI->JSON
+        args = new ArrayList<>(List.of("./midi2json"));
+        byte[] json = runProcess(args, midi, ".mid", ".json", "", false, true);
+        IOUtils.write(json, new FileOutputStream("tmp/out.json"));
 
         //XML->MP3
         args = new ArrayList<>(List.of("/opt/musescore/musescore"));
@@ -61,11 +68,13 @@ public class VerovioConverter {
         //XML->MEI
         args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "mei", "--input-from", "xml"));
         String mei = new String(runProcess(args, xml.getBytes(StandardCharsets.UTF_8), ".xml", ".mei", "--outfile", true, true), StandardCharsets.UTF_8);
-        mei = verovioHandler.fixXml(mei);
+        mei = verovioHandler.fixMei(mei);
         IOUtils.write(mei, new FileOutputStream("tmp/out.mei"), StandardCharsets.UTF_8);
 
         //MEI->SVG
-        args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--spacing-linear", "0.40", "--expand-always", "--breaks", "none", "--output-to", "svg", "--input-from", "mei"));
+        args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data",
+                "--page-margin-bottom", "0", "--page-margin-top", "0", "--page-margin-left", "26", "--page-margin-right", "0",
+                "--spacing-linear", "0.40", "--expand-always", "--breaks", "none", "--output-to", "svg", "--input-from", "mei"));
         String svg = new String(runProcess(args, mei.getBytes(StandardCharsets.UTF_8), ".mei", ".svg", "--outfile", true, true), StandardCharsets.UTF_8);
         svg = verovioHandler.fixSvg(svg);
         IOUtils.write(svg, new FileOutputStream("tmp/out.svg"), StandardCharsets.UTF_8);
@@ -74,7 +83,7 @@ public class VerovioConverter {
         byte[] png = crop(getPngBytes(svg));
         IOUtils.write(png, new FileOutputStream("tmp/out.png"));
 
-        return null;
+        return response;
     }
 
     private static byte @NonNull [] getPngBytes(String svg) throws TranscoderException, IOException {
@@ -105,12 +114,16 @@ public class VerovioConverter {
             Files.write(tempInputFile, input);
 
             if (isOutputFirst) {
-                commandLine.add(outArgName);
+                if (!StringUtils.isEmpty(outArgName)) {
+                    commandLine.add(outArgName);
+                }
                 commandLine.add(tempOutputFile.toString());
                 commandLine.add(tempInputFile.toString());
             } else {
                 commandLine.add(tempInputFile.toString());
-                commandLine.add(outArgName);
+                if (!StringUtils.isEmpty(outArgName)) {
+                    commandLine.add(outArgName);
+                }
                 commandLine.add(tempOutputFile.toString());
             }
 
