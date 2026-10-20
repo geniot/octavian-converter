@@ -8,11 +8,15 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@JacksonXmlRootElement(localName = "g")
-public class _3System {
-    @JacksonXmlElementWrapper(localName = "path")
-    BarPath barPath;
+@JacksonXmlRootElement(localName = "layer")
+public class Layer {
     @JacksonXmlElementWrapper(useWrapping = false)
-    @JacksonXmlProperty(localName = "g")
-    List<Measure> measures;
+    @JacksonXmlProperty(localName = "note")
+    List<Note> notes;
+    @JacksonXmlElementWrapper(useWrapping = false)
+    @JacksonXmlProperty(localName = "beam")
+    List<Beam> beams;
+    @JacksonXmlElementWrapper(useWrapping = false)
+    @JacksonXmlProperty(localName = "chord")
+    List<Chord> chords;
 }

@@ -8,11 +8,9 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@JacksonXmlRootElement(localName = "g")
+@JacksonXmlRootElement(localName = "measure")
 public class Measure {
-    @JacksonXmlProperty(localName = "class")
-    String cl;
     @JacksonXmlElementWrapper(useWrapping = false)
-    @JacksonXmlProperty(localName = "g")
-    List<MeasureItem> measureItems;
+    @JacksonXmlProperty(localName = "staff")
+    List<Staff> staffs;
 }

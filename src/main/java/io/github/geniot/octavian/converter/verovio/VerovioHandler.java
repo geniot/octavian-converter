@@ -49,6 +49,28 @@ public class VerovioHandler {
         }
     }
 
+    public String svg2xml(String svg) throws Exception {
+        InputStream inputStream = new ByteArrayInputStream(svg.getBytes(StandardCharsets.UTF_8));
+        Document document = docBuilder.parse(inputStream);
+        renameElement(document, document.getDocumentElement());
+        String result = document2string(document);
+        return result.replace("xmlns=\"http://www.w3.org/2000/svg\"", "");
+    }
+
+    private void renameElement(Document document, Element element) {
+        if (element.hasAttribute("class")) {
+            String newTagName = element.getAttribute("class").replace("-", "_").replace(" ", "_");
+            document.renameNode(element, null, newTagName);
+        }
+        NodeList children = element.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child instanceof Element) {
+                renameElement(document, (Element) child);
+            }
+        }
+    }
+
     public String fixSvg(String svg) throws Exception {
         svg = svg.replace("font-style:italic;", "font-style:normal;");
         InputStream inputStream = new ByteArrayInputStream(svg.getBytes(StandardCharsets.UTF_8));
@@ -179,7 +201,7 @@ public class VerovioHandler {
         g2d.setStroke(bs);
         //22303 97720
         //? 260+13
-        int x = 22303*273/97720;
+        int x = 22303 * 273 / 97720;
         g2d.drawLine(x, 0, x, image.getHeight());
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

@@ -6,8 +6,8 @@ import lombok.Data;
 
 @Data
 @JacksonXmlRootElement(localName = "svg")
-public class _0SvgRoot {
+public class SvgRoot {
 
-    @JacksonXmlElementWrapper(localName = "svg")
-    _1DefinitionScale a1DefinitionScale;
+    @JacksonXmlElementWrapper(localName = "definition_scale")
+    DefinitionScale definitionScale;
 }

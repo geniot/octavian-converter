@@ -73,6 +73,11 @@ public class VerovioConverter {
         svg = verovioHandler.fixSvg(svg);
         IOUtils.write(svg, new FileOutputStream("tmp/out.svg"), StandardCharsets.UTF_8);
 
+        //SVG->SVG_XML
+
+        String svgXml = verovioHandler.svg2xml(svg);
+        IOUtils.write(svgXml, new FileOutputStream("tmp/out_svg.xml"), StandardCharsets.UTF_8);
+
         //SVG->PNG
         byte[] png = crop(getPngBytes(svg));
         IOUtils.write(png, new FileOutputStream("tmp/out.png"));

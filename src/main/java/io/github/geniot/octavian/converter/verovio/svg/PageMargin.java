@@ -5,8 +5,8 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Data;
 
 @Data
-@JacksonXmlRootElement(localName = "g")
-public class _2PageMargin {
-    @JacksonXmlElementWrapper(localName = "g")
-    _3System system;
+@JacksonXmlRootElement(localName = "page_margin")
+public class PageMargin {
+    @JacksonXmlElementWrapper(localName = "system")
+    System system;
 }

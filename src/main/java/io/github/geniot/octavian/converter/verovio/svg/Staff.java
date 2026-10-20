@@ -5,9 +5,8 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Data;
 
 @Data
-@JacksonXmlRootElement(localName = "svg")
-class _1DefinitionScale {
-
-    @JacksonXmlElementWrapper(localName = "g")
-    _2PageMargin pageMargin;
+@JacksonXmlRootElement(localName = "staff")
+public class Staff {
+    @JacksonXmlElementWrapper(localName = "layer")
+    Layer layer;
 }
