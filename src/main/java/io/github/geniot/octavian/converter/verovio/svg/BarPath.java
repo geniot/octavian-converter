@@ -9,4 +9,12 @@ import lombok.Data;
 public class BarPath {
     @JacksonXmlProperty(localName = "d")
     String d;
+
+    /**
+     * M13 540 L13 3060 -> 13
+     * @return
+     */
+    public Integer getBarOffset() {
+        return Integer.parseInt(d.split(" ")[0].substring(1));
+    }
 }

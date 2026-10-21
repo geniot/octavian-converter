@@ -6,8 +6,8 @@ import lombok.Data;
 
 @Data
 @JacksonXmlRootElement(localName = "definition_scale")
-class DefinitionScale {
+public class DefinitionScale {
 
     @JacksonXmlElementWrapper(localName = "page_margin")
-    PageMargin pageMargin;
+    public PageMargin pageMargin;
 }

@@ -13,4 +13,11 @@ public class Measure {
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "staff")
     List<Staff> staffs;
+
+    @JacksonXmlElementWrapper(localName = "barLine")
+    public BarLine barLine;
+
+    public Integer getBarOffset() {
+        return barLine.getBarOffset();
+    }
 }

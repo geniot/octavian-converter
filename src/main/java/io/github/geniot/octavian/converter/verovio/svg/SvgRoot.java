@@ -9,5 +9,5 @@ import lombok.Data;
 public class SvgRoot {
 
     @JacksonXmlElementWrapper(localName = "definition_scale")
-    DefinitionScale definitionScale;
+    public DefinitionScale definitionScale;
 }

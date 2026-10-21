@@ -5,11 +5,11 @@ import com.zaxxer.nuprocess.NuProcess;
 
 import java.nio.ByteBuffer;
 
-class VerovioProcessHandler extends NuAbstractProcessHandler {
+class ProcessHandler extends NuAbstractProcessHandler {
     private NuProcess nuProcess;
     private final boolean isVerbose;
 
-    public VerovioProcessHandler(boolean verbose) {
+    public ProcessHandler(boolean verbose) {
         this.isVerbose = verbose;
     }
 

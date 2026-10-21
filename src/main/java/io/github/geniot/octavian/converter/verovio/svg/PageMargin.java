@@ -8,5 +8,5 @@ import lombok.Data;
 @JacksonXmlRootElement(localName = "page_margin")
 public class PageMargin {
     @JacksonXmlElementWrapper(localName = "system")
-    System system;
+    public SvgSystem svgSystem;
 }
