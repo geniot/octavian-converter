@@ -6,6 +6,8 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Data;
 
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 @Data
 @JacksonXmlRootElement(localName = "measure")
@@ -19,5 +21,13 @@ public class Measure {
 
     public Integer getBarOffset() {
         return barLine.getBarOffset();
+    }
+
+    public SortedSet<Integer> getNoteOffsets() {
+        SortedSet<Integer> noteOffsets = new TreeSet<>();
+        for (Staff staff : staffs){
+            noteOffsets.addAll(staff.layer.getNoteOffsets());
+        }
+        return noteOffsets;
     }
 }

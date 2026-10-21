@@ -26,4 +26,12 @@ public class SvgSystem {
         }
         return barOffsets;
     }
+
+    public SortedSet<Integer> geNoteOffsets() {
+        SortedSet<Integer> noteOffsets = new TreeSet<>();
+        for (Measure measure : measures) {
+            noteOffsets.addAll(measure.getNoteOffsets());
+        }
+        return noteOffsets;
+    }
 }

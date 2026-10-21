@@ -13,6 +13,7 @@ import java.awt.image.Raster;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.SortedSet;
 
 public class PngHandler {
     public byte @NonNull [] getPngBytes(byte[] svg) throws Exception {
@@ -80,5 +81,18 @@ public class PngHandler {
 
     public byte[] svg2png(byte[] svg) throws Exception {
         return crop(getPngBytes(svg));
+    }
+
+    public byte[] debugLines(byte[] bbs, SortedSet<Integer> barOffsets, Color color, BasicStroke stroke) throws Exception {
+        BufferedImage image = ImageIO.read(new ByteArrayInputStream(bbs));
+        Graphics2D g2d = image.createGraphics();
+        g2d.setColor(color);
+        g2d.setStroke(stroke);
+        for (Integer pngBarOffset : barOffsets) {
+            g2d.drawLine(pngBarOffset, 0, pngBarOffset, image.getHeight());
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", baos);
+        return baos.toByteArray();
     }
 }

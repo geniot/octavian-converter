@@ -1,5 +1,8 @@
 package io.github.geniot.octavian.converter.verovio;
 
+import io.github.geniot.octavian.converter.verovio.svg.SvgRoot;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -9,15 +12,40 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
+import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
 
 public class SvgHandler extends AbstractXmlHandler {
     static Logger logger = LoggerFactory.getLogger(SvgHandler.class);
+
+    public @NonNull SortedSet<Integer> getBarOffsets(SvgRoot svgRoot, Dimension pngDimension) {
+        SortedSet<Integer> svgBarOffsets = svgRoot.definitionScale.pageMargin.svgSystem.geBarOffsets();
+        svgBarOffsets.removeLast();
+        if (svgRoot.definitionScale.pageMargin.svgSystem.getMeasures().size() != svgBarOffsets.size()) {
+            logger.error("Svg Bar Offsets size mismatch");
+        }
+        return getOffsetsScaled(svgRoot, svgBarOffsets, pngDimension);
+    }
+
+    public @NonNull SortedSet<Integer> getNoteOffsets(SvgRoot svgRoot, Dimension pngDimension) {
+        SortedSet<Integer> svgBarOffsets = svgRoot.definitionScale.pageMargin.svgSystem.geNoteOffsets();
+        return getOffsetsScaled(svgRoot, svgBarOffsets, pngDimension);
+    }
+
+    private @NonNull SortedSet<Integer> getOffsetsScaled(SvgRoot svgRoot, SortedSet<Integer> svgBarOffsets, Dimension pngDimension) {
+        Pair<Long, Long> translation = svgRoot.definitionScale.pageMargin.getTranslation();
+        Rectangle viewBox = svgRoot.definitionScale.getViewBox();
+        SortedSet<Integer> pngBarOffsets = new TreeSet<>();
+        for (Integer svgBarOffset : svgBarOffsets) {
+            long pngBarOffset = pngDimension.width * (svgBarOffset + translation.getLeft()) / viewBox.width;
+            pngBarOffsets.add((int) pngBarOffset);
+        }
+        return pngBarOffsets;
+    }
 
 
     public byte[] svg2xml(byte[] svg) throws Exception {
