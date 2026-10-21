@@ -45,7 +45,7 @@ public class SvgHandler extends AbstractXmlHandler {
     public byte[] mei2svg(byte[] meiBbs) throws Exception {
         List<String> args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data",
                 "--page-margin-bottom", "0", "--page-margin-top", "0", "--page-margin-left", "26", "--page-margin-right", "0",
-                "--spacing-linear", "0.40", "--expand-always", "--breaks", "none", "--output-to", "svg", "--input-from", "mei"));
+                "--spacing-linear", "0.40", "--breaks", "none", "--output-to", "svg", "--input-from", "mei"));
         String svg = new String(runProcess(args, meiBbs, ".mei", ".svg", "--outfile", true, true), StandardCharsets.UTF_8);
         svg = fixSvg(svg);
         return svg.getBytes(StandardCharsets.UTF_8);

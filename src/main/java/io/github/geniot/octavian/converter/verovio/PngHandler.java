@@ -41,17 +41,6 @@ public class PngHandler {
     public byte[] crop(byte[] bbs) throws Exception {
         BufferedImage image = ImageIO.read(new ByteArrayInputStream(bbs));
         image = crop(image);
-
-        //debug bar lines
-        Graphics2D g2d = image.createGraphics();
-        g2d.setColor(Color.RED);
-        BasicStroke bs = new BasicStroke(1);
-        g2d.setStroke(bs);
-        //22303 97720
-        //? 260+13
-        int x = 22303 * 273 / 97720;
-        g2d.drawLine(x, 0, x, image.getHeight());
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(image, "png", baos);
         return baos.toByteArray();
