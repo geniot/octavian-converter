@@ -1,10 +1,11 @@
-package io.github.geniot.octavian.converter.model;
+package io.github.geniot.octavian.converter.verovio.json;
 
 
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -14,4 +15,5 @@ public class Note implements Serializable {
     Integer noteValue;
     String noteName;
     String chordName;
+    Map<String, Finger> fingers;
 }

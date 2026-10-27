@@ -1,9 +1,6 @@
-package io.github.geniot.octavian.converter.model;
+package io.github.geniot.octavian.converter.verovio.json;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 

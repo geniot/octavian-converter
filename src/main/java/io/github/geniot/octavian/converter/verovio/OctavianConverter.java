@@ -1,7 +1,5 @@
 package io.github.geniot.octavian.converter.verovio;
 
-import io.github.geniot.octavian.converter.model.Instrument;
-import io.github.geniot.octavian.converter.model.MuseConversionResponse;
 import lombok.Data;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -28,11 +26,7 @@ public class OctavianConverter {
     MeiHandler meiHandler = new MeiHandler();
 
 
-    public MuseConversionResponse convert(String xml,
-                                          int pngHeight,
-                                          String author,
-                                          String title,
-                                          Instrument instrument) throws Exception {
+    public MuseConversionResponse convert(String xml) throws Exception {
         MuseConversionResponse response = new MuseConversionResponse();
         //XML
         IOUtils.write(xml, new FileOutputStream("tmp/out.xml"), StandardCharsets.UTF_8);

@@ -1,4 +1,4 @@
-package io.github.geniot.octavian.converter.model;
+package io.github.geniot.octavian.converter.verovio.json;
 
 import java.io.Serializable;
 

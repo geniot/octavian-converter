@@ -3,8 +3,8 @@ package io.github.geniot.octavian.converter.model.musescore;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import io.github.geniot.octavian.converter.model.Constants;
-import io.github.geniot.octavian.converter.model.Note;
-import io.github.geniot.octavian.converter.model.NoteType;
+import io.github.geniot.octavian.converter.verovio.json.Note;
+import io.github.geniot.octavian.converter.verovio.json.NoteType;
 import io.github.geniot.octavian.converter.model.SvgNote;
 import lombok.Data;
 

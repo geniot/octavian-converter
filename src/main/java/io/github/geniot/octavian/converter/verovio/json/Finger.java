@@ -1,4 +1,4 @@
-package io.github.geniot.octavian.converter.model;
+package io.github.geniot.octavian.converter.verovio.json;
 
 import lombok.Data;
 
@@ -8,11 +8,4 @@ import java.io.Serializable;
 public class Finger implements Serializable {
     String finger;
     Integer button;
-
-    public Finger() {
-    }
-
-    public Finger(String f) {
-        this.finger = f;
-    }
 }

@@ -3,9 +3,9 @@ package io.github.geniot.octavian.converter.model.musescore;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import io.github.geniot.indexedtreemap.IndexedTreeMap;
-import io.github.geniot.octavian.converter.model.Note;
-import io.github.geniot.octavian.converter.model.NoteType;
-import io.github.geniot.octavian.converter.model.Point;
+import io.github.geniot.octavian.converter.verovio.json.Note;
+import io.github.geniot.octavian.converter.verovio.json.NoteType;
+import io.github.geniot.octavian.converter.verovio.json.Point;
 import lombok.Data;
 import org.apache.commons.lang3.SerializationUtils;
 
