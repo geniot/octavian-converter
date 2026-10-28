@@ -21,6 +21,9 @@ public class MusicXmlHandler extends AbstractXmlHandler {
             Node n = searchResultsList.item(i);
             titleAndAuthor.add(n.getTextContent());
         }
+        if (titleAndAuthor.size() != 2) {
+            logger.error("Title and Author are not correct");
+        }
         return titleAndAuthor.toArray(new String[0]);
     }
 }
