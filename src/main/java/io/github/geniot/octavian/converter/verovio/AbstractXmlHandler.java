@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,6 +21,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayOutputStream;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,6 +43,8 @@ public class AbstractXmlHandler {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilderFactory.setNamespaceAware(false);
             docBuilder = documentBuilderFactory.newDocumentBuilder();
+            //ignore dtd https://stackoverflow.com/a/155353/488635
+            docBuilder.setEntityResolver((_, _) -> new InputSource(new StringReader("")));
             xpath = XPathFactory.newInstance().newXPath();
             transformer = transformerFactory.newTransformer();
         } catch (Exception ex) {

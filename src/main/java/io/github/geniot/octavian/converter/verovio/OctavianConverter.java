@@ -26,22 +26,21 @@ public class OctavianConverter {
     MeiHandler meiHandler = new MeiHandler();
 
 
-    public MuseConversionResponse convert(String xml) throws Exception {
-        MuseConversionResponse response = new MuseConversionResponse();
+    public ConversionResponse convert(String xml) throws Exception {
+        ConversionResponse response = new ConversionResponse();
         //XML
         IOUtils.write(xml, new FileOutputStream("tmp/out.xml"), StandardCharsets.UTF_8);
 
         //XML->MIDI
         byte[] midi = midiHandler.xml2midi(xml.getBytes(StandardCharsets.UTF_8));
         IOUtils.write(midi, new FileOutputStream("tmp/out.mid"));
-
         //MIDI->JSON
         byte[] json = midiHandler.midi2json(midi);
         IOUtils.write(json, new FileOutputStream("tmp/out.json"));
 
         //XML->MP3
-        byte[] mp3 = midiHandler.xml2mp3(xml.getBytes(StandardCharsets.UTF_8));
-        IOUtils.write(mp3, new FileOutputStream("tmp/out.mp3"));
+//        byte[] mp3 = midiHandler.xml2mp3(xml.getBytes(StandardCharsets.UTF_8));
+//        IOUtils.write(mp3, new FileOutputStream("tmp/out.mp3"));
 
         //XML->MEI
         byte[] mei = meiHandler.xml2mei(xml.getBytes(StandardCharsets.UTF_8));

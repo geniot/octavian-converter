@@ -4,7 +4,7 @@ import io.github.geniot.octavian.converter.verovio.json.Tune;
 import lombok.Data;
 
 @Data
-public class MuseConversionResponse {
+public class ConversionResponse {
     byte[] pngSheet;
     byte[] mp3;
     Tune tune;

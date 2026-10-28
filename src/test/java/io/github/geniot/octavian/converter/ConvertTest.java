@@ -1,6 +1,6 @@
 package io.github.geniot.octavian.converter;
 
-import io.github.geniot.octavian.converter.verovio.MuseConversionResponse;
+import io.github.geniot.octavian.converter.verovio.ConversionResponse;
 import io.github.geniot.octavian.converter.verovio.OctavianConverter;
 import org.apache.commons.io.IOUtils;
 
@@ -13,7 +13,7 @@ public class ConvertTest {
             String path = "/home/vitaly/IdeaProjects/octavian-data/piano/greensleeves/greensleeves.musicxml";
             OctavianConverter museConverter = new OctavianConverter();
             String xml = IOUtils.toString(new FileInputStream(path), StandardCharsets.UTF_8);
-            MuseConversionResponse response = museConverter.convert(xml);
+            ConversionResponse response = museConverter.convert(xml);
             System.out.println(response);
         } catch (Exception ex) {
             ex.printStackTrace();

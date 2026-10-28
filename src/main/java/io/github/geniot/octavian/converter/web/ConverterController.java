@@ -1,7 +1,7 @@
 package io.github.geniot.octavian.converter.web;
 
-import io.github.geniot.octavian.converter.verovio.MuseConversionRequest;
-import io.github.geniot.octavian.converter.verovio.MuseConversionResponse;
+import io.github.geniot.octavian.converter.verovio.ConversionRequest;
+import io.github.geniot.octavian.converter.verovio.ConversionResponse;
 import io.github.geniot.octavian.converter.verovio.OctavianConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +16,7 @@ public class ConverterController {
 
     @PostMapping(value = "/convert", consumes = {"application/json"})
     public @ResponseBody
-    MuseConversionResponse convertVerovio(@RequestBody MuseConversionRequest request) throws Exception {
+    ConversionResponse convertVerovio(@RequestBody ConversionRequest request) throws Exception {
         return octavianConverter.convert(request.getMuseXml());
     }
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 import javax.sound.midi.Instrument;
 
 @Data
-public class MuseConversionRequest {
+public class ConversionRequest {
     String museXml;
     int pngHeight;
     String author;
