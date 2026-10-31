@@ -1,7 +1,5 @@
 package io.github.geniot.octavian.converter;
 
-import io.github.geniot.octavian.converter.verovio.ConversionResponse;
-import io.github.geniot.octavian.converter.verovio.OctavianConverter;
 import org.apache.commons.io.IOUtils;
 
 import java.io.FileInputStream;

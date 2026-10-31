@@ -2,9 +2,7 @@ package io.github.geniot.octavian.converter;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import io.github.geniot.octavian.converter.verovio.PngHandler;
-import io.github.geniot.octavian.converter.verovio.SvgHandler;
-import io.github.geniot.octavian.converter.verovio.svg.SvgRoot;
+import io.github.geniot.octavian.converter.svg.SvgRoot;
 import org.apache.commons.io.IOUtils;
 
 import java.awt.*;

@@ -2,9 +2,9 @@ package io.github.geniot.octavian.converter.tools;
 
 import io.github.geniot.indexedtreemap.IndexedTreeMap;
 import io.github.geniot.octavian.converter.model.*;
-import io.github.geniot.octavian.converter.verovio.json.Note;
-import io.github.geniot.octavian.converter.verovio.json.NoteType;
-import io.github.geniot.octavian.converter.verovio.json.Point;
+import io.github.geniot.octavian.converter.json.Note;
+import io.github.geniot.octavian.converter.json.NoteType;
+import io.github.geniot.octavian.converter.json.Point;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

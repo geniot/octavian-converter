@@ -2,7 +2,7 @@ package io.github.geniot.octavian.converter;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.geniot.octavian.converter.verovio.json.Tune;
+import io.github.geniot.octavian.converter.json.Tune;
 import io.github.geniot.octavian.converter.tools.MuseConverter;
 
 import java.nio.charset.StandardCharsets;

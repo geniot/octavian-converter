@@ -1,4 +1,4 @@
-package io.github.geniot.octavian.converter.verovio.svg.commands;
+package io.github.geniot.octavian.converter.svg.commands;
 
 import lombok.Setter;
 

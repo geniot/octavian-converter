@@ -1,6 +1,6 @@
 package io.github.geniot.octavian.converter;
 
-import io.github.geniot.octavian.converter.verovio.midi.MidiRoot;
+import io.github.geniot.octavian.converter.midi.MidiRoot;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.nio.charset.StandardCharsets;

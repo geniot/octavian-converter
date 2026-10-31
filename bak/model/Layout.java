@@ -1,7 +1,7 @@
 package io.github.geniot.octavian.converter.model;
 
 import com.google.common.collect.ImmutableSet;
-import io.github.geniot.octavian.converter.verovio.json.NoteType;
+import io.github.geniot.octavian.converter.json.NoteType;
 import lombok.Getter;
 import lombok.Setter;
 

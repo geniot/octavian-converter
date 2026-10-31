@@ -2,13 +2,10 @@ package io.github.geniot.octavian.converter;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import io.github.geniot.octavian.converter.verovio.MusicXmlHandler;
-import io.github.geniot.octavian.converter.verovio.PngHandler;
-import io.github.geniot.octavian.converter.verovio.SvgHandler;
-import io.github.geniot.octavian.converter.verovio.json.Point;
-import io.github.geniot.octavian.converter.verovio.json.Tune;
-import io.github.geniot.octavian.converter.verovio.midi.MidiRoot;
-import io.github.geniot.octavian.converter.verovio.svg.SvgRoot;
+import io.github.geniot.octavian.converter.json.Point;
+import io.github.geniot.octavian.converter.json.Tune;
+import io.github.geniot.octavian.converter.midi.MidiRoot;
+import io.github.geniot.octavian.converter.svg.SvgRoot;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
