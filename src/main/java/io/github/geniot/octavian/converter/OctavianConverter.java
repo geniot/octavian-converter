@@ -31,10 +31,10 @@ public class OctavianConverter {
         //XML
         IOUtils.write(xml, new FileOutputStream("tmp/out.xml"), StandardCharsets.UTF_8);
 
-        //XML->MIDI
+        //XML->MIDI (musescore)
         byte[] midi = midiHandler.xml2midi(xml.getBytes(StandardCharsets.UTF_8));
         IOUtils.write(midi, new FileOutputStream("tmp/out.mid"));
-        //MIDI->JSON
+        //MIDI->JSON (midi2json)
         byte[] json = midiHandler.midi2json(midi);
         IOUtils.write(json, new FileOutputStream("tmp/out.json"));
 
@@ -42,19 +42,19 @@ public class OctavianConverter {
 //        byte[] mp3 = midiHandler.xml2mp3(xml.getBytes(StandardCharsets.UTF_8));
 //        IOUtils.write(mp3, new FileOutputStream("tmp/out.mp3"));
 
-        //XML->MEI
+        //XML->MEI (verovio)
         byte[] mei = meiHandler.xml2mei(xml.getBytes(StandardCharsets.UTF_8));
         IOUtils.write(mei, new FileOutputStream("tmp/out.mei"));
 
-        //MEI->SVG
+        //MEI->SVG (verovio)
         byte[] svg = svgHandler.mei2svg(mei);
         IOUtils.write(svg, new FileOutputStream("tmp/out.svg"));
 
-        //SVG->SVG_XML
+        //SVG->SVG_XML (java)
         byte[] svgXml = svgHandler.svg2xml(svg);
         IOUtils.write(svgXml, new FileOutputStream("tmp/out_svg.xml"));
 
-        //SVG->PNG
+        //SVG->PNG (echosvg)
         byte[] png = pngHandler.svg2png(svg);
         IOUtils.write(png, new FileOutputStream("tmp/out.png"));
 

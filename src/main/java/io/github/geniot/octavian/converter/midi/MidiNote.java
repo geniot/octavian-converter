@@ -1,5 +1,6 @@
 package io.github.geniot.octavian.converter.midi;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -13,6 +14,8 @@ import lombok.Data;
  */
 @Data
 public class MidiNote {
+    @JsonIgnore
+    String id;
     @JsonProperty(value = "duration")
     double duration;
     @JsonProperty(value = "durationTicks")

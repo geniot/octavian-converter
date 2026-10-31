@@ -23,15 +23,16 @@ public class TuneTest {
             MusicXmlHandler handler = new MusicXmlHandler();
             SvgHandler svgHandler = new SvgHandler();
             JsonMapper jsonMapper = new JsonMapper();
-            MidiHandler midiHandler = new MidiHandler();
+            PointsHandler pointsHandler = new PointsHandler();
             ObjectMapper objectMapper = new ObjectMapper();
             IndexedTreeMap<Integer, Point> points = new IndexedTreeMap<>();
+
+            String musicXmlStr = Files.readString(Path.of("tmp/out.xml"), StandardCharsets.UTF_8);
+            String meiXmlStr = Files.readString(Path.of("tmp/out.mei"), StandardCharsets.UTF_8);
 
             Tune tune = new Tune();
 
             //title, author
-            String musicXmlStr = Files.readString(Path.of("tmp/out.xml"), StandardCharsets.UTF_8);
-
             String[] titleAndAuthor = handler.getTitleAndAuthor(musicXmlStr);
             tune.setTitle(titleAndAuthor[0]);
             tune.setAuthor(titleAndAuthor[1]);
@@ -65,7 +66,8 @@ public class TuneTest {
             //points
             String jsonStr = Files.readString(Path.of("tmp/out.json"), StandardCharsets.UTF_8);
             MidiRoot midiRoot = jsonMapper.readValue(jsonStr, MidiRoot.class);
-            midiHandler.addPoints(points, midiRoot);
+            pointsHandler.identifyNotes(meiXmlStr, midiRoot);
+            pointsHandler.addPoints(points, midiRoot);
             tune.setPoints(points.sequencedValues().toArray(new Point[0]));
 
             String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(tune);
