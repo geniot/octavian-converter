@@ -5,9 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Data;
 
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 @Data
 @JacksonXmlRootElement(localName = "measure")
@@ -25,9 +23,17 @@ public class Measure {
 
     public SortedSet<Integer> getNoteOffsets() {
         SortedSet<Integer> noteOffsets = new TreeSet<>();
-        for (Staff staff : staffs){
+        for (Staff staff : staffs) {
             noteOffsets.addAll(staff.layer.getNoteOffsets());
         }
         return noteOffsets;
+    }
+
+    public Map<String,Use> getNoteHeadHrefs() {
+        Map<String,Use> noteHeadHrefs = new HashMap<>();
+        for (Staff staff : staffs) {
+            noteHeadHrefs.putAll(staff.layer.getNoteHeadHrefs());
+        }
+        return noteHeadHrefs;
     }
 }

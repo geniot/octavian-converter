@@ -1,10 +1,10 @@
-package io.github.geniot.octavian.converter.model.commands;
+package io.github.geniot.octavian.converter.verovio.svg.commands;
 
 import lombok.Setter;
 
 /**
  * MoveTo
- * https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#path_commands
+ * <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#path_commands">...</a>
  */
 @Setter
 public class MCommand extends DCommand {

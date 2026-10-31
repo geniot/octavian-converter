@@ -1,6 +1,7 @@
 package io.github.geniot.octavian.converter.verovio;
 
 import io.github.geniot.octavian.converter.verovio.svg.SvgRoot;
+import io.github.geniot.octavian.converter.verovio.svg.Use;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -21,6 +22,17 @@ import java.util.List;
 
 public class SvgHandler extends AbstractXmlHandler {
     static Logger logger = LoggerFactory.getLogger(SvgHandler.class);
+    private final PngHandler pngHandler = new PngHandler();
+
+    private static final String TEMPLATE = """
+            <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+            <svg xmlns="http://www.w3.org/2000/svg"  overflow="visible" version="1.1" width="${width}px" height="${height}px">
+                <svg viewBox="0 0 ${width}0 ${height}0">
+                    <g transform="translate(300, 300) scale(${scale_x}, ${scale_y})">
+                        <path d="${path}"/>
+                    </g>
+                </svg>
+            </svg>""";
 
     public @NonNull SortedSet<Integer> getBarOffsets(SvgRoot svgRoot, Dimension pngDimension) {
         SortedSet<Integer> svgBarOffsets = svgRoot.definitionScale.pageMargin.svgSystem.geBarOffsets();
@@ -102,5 +114,29 @@ public class SvgHandler extends AbstractXmlHandler {
             Node n = searchResultsList.item(i);
             ((Element) n).setAttribute("font-size", "250px");
         }
+    }
+
+    public int getPlayHeadWidth(SvgRoot svgRoot) throws Exception {
+        Rectangle rec = svgRoot.definitionScale.getViewBox();
+        String width = String.valueOf(rec.width/10);
+        String height = String.valueOf(rec.height/10);
+        Map<String, Use> noteHeadHrefs = svgRoot.definitionScale.pageMargin.svgSystem.getNoteHeadHrefs();
+        int maxPlayHeadWidth = 20;
+        for (String href : noteHeadHrefs.keySet()) {
+            String path = svgRoot.defs.getPathByHref(href);
+            String scaleX = String.valueOf(noteHeadHrefs.get(href).getScaleX());
+            String scaleY = String.valueOf(noteHeadHrefs.get(href).getScaleY());
+            String template = TEMPLATE
+                    .replaceAll("\\$\\{path}", path)
+                    .replaceAll("\\$\\{width}", width)
+                    .replaceAll("\\$\\{height}", height)
+                    .replaceAll("\\$\\{scale_x}", scaleX)
+                    .replaceAll("\\$\\{scale_y}", scaleY);
+            byte[] png = pngHandler.svg2png(template.getBytes(StandardCharsets.UTF_8));
+//            Files.write(Path.of("tmp/" + href + ".png"), png);
+            Dimension dimension = pngHandler.getPngDimension(png);
+            maxPlayHeadWidth = Math.max(maxPlayHeadWidth, dimension.width);
+        }
+        return maxPlayHeadWidth;
     }
 }

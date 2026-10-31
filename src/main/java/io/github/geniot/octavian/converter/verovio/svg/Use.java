@@ -10,6 +10,9 @@ public class Use {
     @JacksonXmlElementWrapper(localName = "transform")
     String transform;
 
+    @JacksonXmlElementWrapper(localName = "href")
+    String xlinkHref;
+
     /**
      * translate(2266, 810) scale(0.72, 0.72)
      *
@@ -17,5 +20,13 @@ public class Use {
      */
     public Integer getOffset() {
         return Integer.parseInt(transform.split(",")[0].split("\\(")[1]);
+    }
+
+    public float getScaleX() {
+        return Float.parseFloat(transform.split("scale")[1].split(",")[0].replaceAll("[()]", "").trim());
+    }
+
+    public float getScaleY() {
+        return Float.parseFloat(transform.split("scale")[1].split(",")[1].replaceAll("[()]", "").trim());
     }
 }

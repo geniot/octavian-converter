@@ -30,7 +30,7 @@ public class PngHandler {
         os.flush();
         os.close();
         byte[] bbs = os.toByteArray();
-        System.out.println(System.currentTimeMillis() - time);
+        System.out.println("SVG->PNG took: " + (System.currentTimeMillis() - time));
         return bbs;
     }
 

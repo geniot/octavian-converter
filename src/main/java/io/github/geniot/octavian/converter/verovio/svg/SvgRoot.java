@@ -10,4 +10,7 @@ public class SvgRoot {
 
     @JacksonXmlElementWrapper(localName = "definition_scale")
     public DefinitionScale definitionScale;
+
+    @JacksonXmlElementWrapper(localName = "defs")
+    public Defs defs;
 }

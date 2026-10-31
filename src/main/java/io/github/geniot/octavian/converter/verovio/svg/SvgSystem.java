@@ -5,9 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Data;
 
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 @Data
 @JacksonXmlRootElement(localName = "system")
@@ -33,5 +31,13 @@ public class SvgSystem {
             noteOffsets.addAll(measure.getNoteOffsets());
         }
         return noteOffsets;
+    }
+
+    public Map<String,Use> getNoteHeadHrefs() {
+        Map<String,Use> noteHeadHrefs = new HashMap<>();
+        for (Measure measure : measures) {
+            noteHeadHrefs.putAll(measure.getNoteHeadHrefs());
+        }
+        return noteHeadHrefs;
     }
 }
