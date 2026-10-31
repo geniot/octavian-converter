@@ -12,5 +12,5 @@ import java.util.List;
 public class Beam {
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "note")
-    List<Note> notes;
+    List<SvgNote> notes;
 }

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MeiHandler extends AbstractXmlHandler {
+public class MeiHandler extends AbstractHandler {
     public byte[] xml2mei(byte[] xmlBbs) throws Exception {
         List<String> args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "mei", "--input-from", "xml"));
         String mei = new String(runProcess(args, xmlBbs, ".xml", ".mei", "--outfile", true, true), StandardCharsets.UTF_8);

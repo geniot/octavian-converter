@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @JacksonXmlRootElement(localName = "note")
-public class Note {
+public class SvgNote {
     @JacksonXmlElementWrapper(localName = "notehead")
     NoteHead noteHead;
 }

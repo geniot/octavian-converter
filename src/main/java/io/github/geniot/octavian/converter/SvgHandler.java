@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
 
-public class SvgHandler extends AbstractXmlHandler {
+public class SvgHandler extends AbstractHandler {
     static Logger logger = LoggerFactory.getLogger(SvgHandler.class);
     private final PngHandler pngHandler = new PngHandler();
 

@@ -28,8 +28,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class AbstractXmlHandler {
-    static Logger logger = LoggerFactory.getLogger(AbstractXmlHandler.class);
+public class AbstractHandler {
+    static Logger logger = LoggerFactory.getLogger(AbstractHandler.class);
 
     XmlMapper xmlMapper = new XmlMapper();
     DocumentBuilder docBuilder;
@@ -37,7 +37,7 @@ public class AbstractXmlHandler {
     TransformerFactory transformerFactory = TransformerFactory.newInstance();
     Transformer transformer;
 
-    public AbstractXmlHandler() {
+    public AbstractHandler() {
         try {
             xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();

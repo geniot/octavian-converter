@@ -12,7 +12,7 @@ import java.util.*;
 public class Layer {
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "note")
-    List<Note> notes = new ArrayList<>();
+    List<SvgNote> notes = new ArrayList<>();
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "beam")
     List<Beam> beams = new ArrayList<>();
@@ -22,16 +22,16 @@ public class Layer {
 
     public SortedSet<Integer> getNoteOffsets() {
         SortedSet<Integer> noteOffsets = new TreeSet<>();
-        for (Note note : notes) {
+        for (SvgNote note : notes) {
             noteOffsets.add(note.noteHead.use.getOffset());
         }
         for (Beam beam : beams) {
-            for (Note note : beam.notes) {
+            for (SvgNote note : beam.notes) {
                 noteOffsets.add(note.noteHead.use.getOffset());
             }
         }
         for (Chord chord : chords) {
-            for (Note note : chord.notes) {
+            for (SvgNote note : chord.notes) {
                 noteOffsets.add(note.noteHead.use.getOffset());
             }
         }
@@ -40,16 +40,16 @@ public class Layer {
 
     public Map<String,Use> getNoteHeadHrefs() {
         Map<String,Use> noteHeadHrefs = new HashMap<>();
-        for (Note note : notes) {
+        for (SvgNote note : notes) {
             noteHeadHrefs.put(note.noteHead.use.getXlinkHref(),note.noteHead.use);
         }
         for (Beam beam : beams) {
-            for (Note note : beam.notes) {
+            for (SvgNote note : beam.notes) {
                 noteHeadHrefs.put(note.noteHead.use.getXlinkHref(),note.noteHead.use);
             }
         }
         for (Chord chord : chords) {
-            for (Note note : chord.notes) {
+            for (SvgNote note : chord.notes) {
                 noteHeadHrefs.put(note.noteHead.use.getXlinkHref(),note.noteHead.use);
             }
         }

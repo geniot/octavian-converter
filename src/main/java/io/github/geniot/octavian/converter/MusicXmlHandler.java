@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MusicXmlHandler extends AbstractXmlHandler {
+public class MusicXmlHandler extends AbstractHandler {
     public String[] getTitleAndAuthor(String musicXml) throws Exception {
         List<String> titleAndAuthor = new ArrayList<>();
         InputStream inputStream = new ByteArrayInputStream(musicXml.getBytes(StandardCharsets.UTF_8));

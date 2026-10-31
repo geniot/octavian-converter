@@ -2,6 +2,7 @@ package io.github.geniot.octavian.converter;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import io.github.geniot.indexedtreemap.IndexedTreeMap;
 import io.github.geniot.octavian.converter.json.Point;
 import io.github.geniot.octavian.converter.json.Tune;
 import io.github.geniot.octavian.converter.midi.MidiRoot;
@@ -18,17 +19,24 @@ import java.util.SortedSet;
 public class TuneTest {
     static void main(String[] args) {
         try {
+            PngHandler pngHandler = new PngHandler();
+            MusicXmlHandler handler = new MusicXmlHandler();
+            SvgHandler svgHandler = new SvgHandler();
+            JsonMapper jsonMapper = new JsonMapper();
+            MidiHandler midiHandler = new MidiHandler();
+            ObjectMapper objectMapper = new ObjectMapper();
+            IndexedTreeMap<Integer, Point> points = new IndexedTreeMap<>();
+
             Tune tune = new Tune();
 
             //title, author
             String musicXmlStr = Files.readString(Path.of("tmp/out.xml"), StandardCharsets.UTF_8);
-            MusicXmlHandler handler = new MusicXmlHandler();
+
             String[] titleAndAuthor = handler.getTitleAndAuthor(musicXmlStr);
             tune.setTitle(titleAndAuthor[0]);
             tune.setAuthor(titleAndAuthor[1]);
 
             //png height, width
-            PngHandler pngHandler = new PngHandler();
             Dimension dimension = pngHandler.getPngDimension(Files.readAllBytes(Path.of("tmp/out.png")));
             tune.setPngHeight(dimension.height);
             tune.setPngWidth(dimension.width);
@@ -37,7 +45,6 @@ public class TuneTest {
             tune.setSelectionRanges(new int[]{});
 
             //bar offsets
-            SvgHandler svgHandler = new SvgHandler();
             String svgStr = Files.readString(Path.of("tmp/out_svg.xml"), StandardCharsets.UTF_8);
             XmlMapper xmlMapper = new XmlMapper();
             xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -48,23 +55,20 @@ public class TuneTest {
 
             //sheet height, width
             Rectangle viewBox = svgRoot.definitionScale.getViewBox();
-            float newWidth = 300f * (viewBox.width+260f) / (float) viewBox.height;
+            float newWidth = 300f * (viewBox.width + 260f) / (float) viewBox.height;
             tune.setSheetHeight(300);
             tune.setSheetWidth((int) newWidth);
 
             //play head width
-            tune.setPlayHeadWidth(svgHandler.getPlayHeadWidth(svgRoot));
+//            tune.setPlayHeadWidth(svgHandler.getPlayHeadWidth(svgRoot));
 
             //points
             String jsonStr = Files.readString(Path.of("tmp/out.json"), StandardCharsets.UTF_8);
-            JsonMapper jsonMapper = new JsonMapper();
             MidiRoot midiRoot = jsonMapper.readValue(jsonStr, MidiRoot.class);
-            tune.setPoints(new Point[]{});
+            midiHandler.addPoints(points, midiRoot);
+            tune.setPoints(points.sequencedValues().toArray(new Point[0]));
 
-
-            ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(tune);
-
             Files.writeString(Path.of("tmp/actual.json"), json);
 
         } catch (Exception ex) {
