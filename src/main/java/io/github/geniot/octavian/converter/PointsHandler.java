@@ -15,7 +15,9 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.SortedSet;
 
 public class PointsHandler extends AbstractHandler {
 
@@ -86,9 +88,14 @@ public class PointsHandler extends AbstractHandler {
     }
 
 
+    /**
+     * Setting x offsets for OFF notes based on surrounding offsets and milliseconds.
+     *
+     * @param points
+     * @param width
+     */
     public void setOffsetsToOffPoints(ArrayList<Point> points, float width) {
-        int duration = points.getLast().getTimestamp() + 35;
-        //setting x offsets for OFF notes based on surrounding offsets and milliseconds
+        int duration = points.getLast().getTimestamp() + 35; //todo: find a better way for total duration
         for (int i = 0; i < points.size(); i++) {
             Point point = points.get(i);
             if (point.getNotesOn().isEmpty() && !point.getNotesOff().isEmpty()) {
@@ -149,5 +156,13 @@ public class PointsHandler extends AbstractHandler {
             ++i;
         }
         return null;
+    }
+
+    public void setBars(IndexedTreeMap<Integer, Point> points, SortedSet<Integer> barOffsets) {
+        for (Point point : points.values()) {
+            int insertionPoint = Arrays.binarySearch(barOffsets.toArray(), point.getOffsetX());
+            insertionPoint = insertionPoint < 0 ? Math.abs(insertionPoint) - 1 : insertionPoint;
+            point.setBar(insertionPoint - 1);
+        }
     }
 }

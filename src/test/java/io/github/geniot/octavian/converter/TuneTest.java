@@ -70,6 +70,7 @@ public class TuneTest {
             pointsHandler.identifyNotes(meiXmlStr, midiRoot);
             pointsHandler.addPoints(points, midiRoot, svgRoot.definitionScale.pageMargin.svgSystem.geNoteOffsets());
             pointsHandler.setOffsetsToOffPoints(new ArrayList<>(points.values()), newWidth);
+            pointsHandler.setBars(points, barOffsets);
             tune.setPoints(points.sequencedValues().toArray(new Point[0]));
 
             String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(tune);
