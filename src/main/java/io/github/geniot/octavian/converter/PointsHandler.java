@@ -14,6 +14,7 @@ import javax.xml.xpath.XPathConstants;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class PointsHandler extends AbstractHandler {
@@ -82,5 +83,71 @@ public class PointsHandler extends AbstractHandler {
         String name = midiNote.getName();
         int length = name.length();
         return (name.charAt(0) + String.valueOf(name.charAt(length - 1))).toLowerCase();
+    }
+
+
+    public void setOffsetsToOffPoints(ArrayList<Point> points, float width) {
+        int duration = points.getLast().getTimestamp() + 35;
+        //setting x offsets for OFF notes based on surrounding offsets and milliseconds
+        for (int i = 0; i < points.size(); i++) {
+            Point point = points.get(i);
+            if (point.getNotesOn().isEmpty() && !point.getNotesOff().isEmpty()) {
+                Point prevOnPoint = getPrevOnPoint(points, i);
+                Point nextOnPoint = getNextOnPoint(points, i);
+
+                int prevOffset = prevOnPoint == null ? 0 : prevOnPoint.getOffsetX();
+                int nextOffset = nextOnPoint == null ? (int) width : nextOnPoint.getOffsetX();
+                if (prevOffset == -1 || nextOffset == -1) {
+                    throw new RuntimeException("Surrounding offsets not initialized for " + i);
+                }
+
+                int thisTimestamp = point.getTimestamp();
+                int prevTimestamp = prevOnPoint == null ? 0 : prevOnPoint.getTimestamp();
+                int nextTimestamp = nextOnPoint == null ? duration : nextOnPoint.getTimestamp();
+
+                int deltaOffset = nextOffset - prevOffset;
+                int deltaTimestamp = nextTimestamp - prevTimestamp;
+                int deltaThisTimestamp = thisTimestamp - prevTimestamp;
+                float thisTimestampPercent = (float) deltaThisTimestamp * 100 / (float) deltaTimestamp;
+
+                float deltaThisOffset = deltaOffset * (thisTimestampPercent / 100);
+                if (deltaThisOffset < 1) {
+                    deltaThisOffset = 1;
+                }
+
+                int thisOffset = prevOffset + (int) deltaThisOffset;
+
+                point.setOffsetX(thisOffset);
+
+            }
+        }
+    }
+
+    private Point getPrevOnPoint(ArrayList<Point> points, int i) {
+        if (i == 0) {
+            return null;
+        }
+        --i;
+        while (i >= 0) {
+            if (!points.get(i).getNotesOn().isEmpty()) {
+                return points.get(i);
+            }
+            --i;
+        }
+        return null;
+    }
+
+    private Point getNextOnPoint(ArrayList<Point> points, int i) {
+        if (i == points.size() - 1) {
+            return null;
+        }
+        ++i;
+        while (i < points.size()) {
+            if (!points.get(i).getNotesOn().isEmpty()) {
+                return points.get(i);
+            }
+            ++i;
+        }
+        return null;
     }
 }

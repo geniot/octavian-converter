@@ -14,6 +14,7 @@ import java.awt.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.SortedSet;
 
 public class TuneTest {
@@ -68,6 +69,7 @@ public class TuneTest {
             MidiRoot midiRoot = jsonMapper.readValue(jsonStr, MidiRoot.class);
             pointsHandler.identifyNotes(meiXmlStr, midiRoot);
             pointsHandler.addPoints(points, midiRoot, svgRoot.definitionScale.pageMargin.svgSystem.geNoteOffsets());
+            pointsHandler.setOffsetsToOffPoints(new ArrayList<>(points.values()), newWidth);
             tune.setPoints(points.sequencedValues().toArray(new Point[0]));
 
             String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(tune);
