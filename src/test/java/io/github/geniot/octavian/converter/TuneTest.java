@@ -67,7 +67,7 @@ public class TuneTest {
             String jsonStr = Files.readString(Path.of("tmp/out.json"), StandardCharsets.UTF_8);
             MidiRoot midiRoot = jsonMapper.readValue(jsonStr, MidiRoot.class);
             pointsHandler.identifyNotes(meiXmlStr, midiRoot);
-            pointsHandler.addPoints(points, midiRoot);
+            pointsHandler.addPoints(points, midiRoot, svgRoot.definitionScale.pageMargin.svgSystem.geNoteOffsets());
             tune.setPoints(points.sequencedValues().toArray(new Point[0]));
 
             String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(tune);

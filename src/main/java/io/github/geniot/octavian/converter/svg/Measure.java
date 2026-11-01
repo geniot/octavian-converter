@@ -21,10 +21,10 @@ public class Measure {
         return barLine.getBarOffset();
     }
 
-    public SortedSet<Integer> getNoteOffsets() {
-        SortedSet<Integer> noteOffsets = new TreeSet<>();
+    public Map<String, Integer> getNoteOffsets() {
+        Map<String, Integer> noteOffsets = new HashMap<>();
         for (Staff staff : staffs) {
-            noteOffsets.addAll(staff.layer.getNoteOffsets());
+            noteOffsets.putAll(staff.layer.getNoteOffsets());
         }
         return noteOffsets;
     }

@@ -14,10 +14,11 @@ import javax.xml.xpath.XPathConstants;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 public class PointsHandler extends AbstractHandler {
 
-    public void addPoints(IndexedTreeMap<Integer, Point> points, MidiRoot midiRoot) {
+    public void addPoints(IndexedTreeMap<Integer, Point> points, MidiRoot midiRoot, Map<String, Integer> noteOffsets) throws Exception {
         for (MidiTrack track : midiRoot.getTracks()) {
             for (MidiNote note : track.getNotes()) {
                 int duration = (int) (note.getDuration() * 1000);
@@ -26,6 +27,7 @@ public class PointsHandler extends AbstractHandler {
                 int value = note.getMidi();
 
                 Point onPoint = points.getOrDefault(onTime, new Point());
+                setOffsetX(onPoint, note, noteOffsets);
                 onPoint.setTimestamp(onTime);
                 Note onNote = new Note();
                 onNote.setDuration(duration);
@@ -42,6 +44,17 @@ public class PointsHandler extends AbstractHandler {
                 points.put(offTime, offPoint);
             }
         }
+    }
+
+    private void setOffsetX(Point onPoint, MidiNote note, Map<String, Integer> noteOffsets) throws Exception {
+        Integer offset = noteOffsets.get(note.getId());
+        if (offset == null) {
+            throw new Exception("Note id not found: " + note.getId());
+        }
+        if (onPoint.getOffsetX() != null && !onPoint.getOffsetX().equals(offset)) {
+            throw new Exception("Offset X or Offset X not equal: " + onPoint.getOffsetX());
+        }
+        onPoint.setOffsetX(offset);
     }
 
     public void identifyNotes(String meiXmlStr, MidiRoot midiRoot) throws Exception {

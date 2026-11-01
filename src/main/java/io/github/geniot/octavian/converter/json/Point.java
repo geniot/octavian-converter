@@ -18,9 +18,9 @@ import java.util.List;
 })
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Point implements Serializable {
-    int timestamp;
-    int offsetX;
-    int bar;
+    Integer timestamp;
+    Integer offsetX;
+    Integer bar;
 
     List<Note> notesOn = new ArrayList<>();
     List<Note> notesOff = new ArrayList<>();

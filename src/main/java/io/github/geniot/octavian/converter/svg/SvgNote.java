@@ -9,4 +9,6 @@ import lombok.Data;
 public class SvgNote {
     @JacksonXmlElementWrapper(localName = "notehead")
     NoteHead noteHead;
+    @JacksonXmlElementWrapper(localName = "id")
+    public String id;
 }

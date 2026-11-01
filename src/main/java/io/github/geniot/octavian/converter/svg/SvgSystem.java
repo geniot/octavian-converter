@@ -25,10 +25,10 @@ public class SvgSystem {
         return barOffsets;
     }
 
-    public SortedSet<Integer> geNoteOffsets() {
-        SortedSet<Integer> noteOffsets = new TreeSet<>();
+    public Map<String, Integer> geNoteOffsets() {
+        Map<String, Integer> noteOffsets = new HashMap<>();
         for (Measure measure : measures) {
-            noteOffsets.addAll(measure.getNoteOffsets());
+            noteOffsets.putAll(measure.getNoteOffsets());
         }
         return noteOffsets;
     }
@@ -39,5 +39,9 @@ public class SvgSystem {
             noteHeadHrefs.putAll(measure.getNoteHeadHrefs());
         }
         return noteHeadHrefs;
+    }
+
+    public int getNoteOffset(String id) {
+        return 0;
     }
 }

@@ -44,8 +44,9 @@ public class SvgHandler extends AbstractHandler {
     }
 
     public @NonNull SortedSet<Integer> getNoteOffsets(SvgRoot svgRoot, Dimension pngDimension) {
-        SortedSet<Integer> svgBarOffsets = svgRoot.definitionScale.pageMargin.svgSystem.geNoteOffsets();
-        return getOffsetsScaled(svgRoot, svgBarOffsets, pngDimension);
+        Map<String, Integer> svgBarOffsetsMap = svgRoot.definitionScale.pageMargin.svgSystem.geNoteOffsets();
+        SortedSet<Integer> noteOffsets = new TreeSet<>(svgBarOffsetsMap.values());
+        return getOffsetsScaled(svgRoot, noteOffsets, pngDimension);
     }
 
     private @NonNull SortedSet<Integer> getOffsetsScaled(SvgRoot svgRoot, SortedSet<Integer> svgBarOffsets, Dimension pngDimension) {
@@ -118,8 +119,8 @@ public class SvgHandler extends AbstractHandler {
 
     public int getPlayHeadWidth(SvgRoot svgRoot) throws Exception {
         Rectangle rec = svgRoot.definitionScale.getViewBox();
-        String width = String.valueOf(rec.width/10);
-        String height = String.valueOf(rec.height/10);
+        String width = String.valueOf(rec.width / 10);
+        String height = String.valueOf(rec.height / 10);
         Map<String, Use> noteHeadHrefs = svgRoot.definitionScale.pageMargin.svgSystem.getNoteHeadHrefs();
         int maxPlayHeadWidth = 20;
         for (String href : noteHeadHrefs.keySet()) {
