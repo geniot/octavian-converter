@@ -31,12 +31,14 @@ public class PointsHandler {
                 Note onNote = new Note();
                 onNote.setDuration(duration);
                 onNote.setNoteValue(value);
+                onNote.setNoteName(Constants.NOTE_NAME_MAP.get(value));
                 onPoint.getNotesOn().add(onNote);
 
                 Point offPoint = points.getOrDefault(offTime, new Point());
                 offPoint.setTimestamp(offTime);
                 Note offNote = new Note();
                 offNote.setNoteValue(value);
+                offNote.setNoteName(Constants.NOTE_NAME_MAP.get(value));
                 offPoint.getNotesOff().add(offNote);
 
                 points.put(onTime, onPoint);
