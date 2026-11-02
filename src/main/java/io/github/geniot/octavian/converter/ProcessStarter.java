@@ -40,7 +40,7 @@ public class ProcessStarter {
 //                "--scale", "150",
                 "--adjust-page-height", "--adjust-page-width",
                 "--page-margin-bottom", "0", "--page-margin-top", "0", "--page-margin-left", "26", "--page-margin-right", "0",
-                "--spacing-linear", "0.40",
+                "--spacing-linear", "0.45",
                 "--breaks", "none",
                 "--output-to", "svg",
                 "--input-from", "mei"

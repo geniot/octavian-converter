@@ -9,21 +9,14 @@ import java.io.ByteArrayOutputStream;
 import java.util.SortedSet;
 
 public class PngHandler {
-    public final BufferedImage image;
+    public BufferedImage image;
 
-    public PngHandler(byte[] png) throws Exception{
+    public PngHandler(byte[] png) throws Exception {
         this.image = ImageIO.read(new ByteArrayInputStream(png));
+        this.crop();
     }
 
-    public byte[] crop(byte[] bbs) throws Exception {
-        BufferedImage image = ImageIO.read(new ByteArrayInputStream(bbs));
-        image = crop(image);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(image, "png", baos);
-        return baos.toByteArray();
-    }
-
-    public BufferedImage crop(BufferedImage image) {
+    private void crop() {
         int minY = 0, maxY = 0, minX = Integer.MAX_VALUE, maxX = 0;
         boolean isBlank, minYIsDefined = false;
         Raster raster = image.getRaster();
@@ -52,17 +45,19 @@ public class PngHandler {
             }
         }
 
-        return image.getSubimage(minX, minY, maxX - minX + 1, maxY - minY + 1);
+        image = image.getSubimage(minX, minY, maxX - minX + 1, maxY - minY + 1);
     }
 
-    public byte[] debugLines(byte[] bbs, SortedSet<Integer> barOffsets, Color color, BasicStroke stroke) throws Exception {
-        BufferedImage image = ImageIO.read(new ByteArrayInputStream(bbs));
+    public void debugLines(SortedSet<Integer> barOffsets, Color color, BasicStroke stroke) {
         Graphics2D g2d = image.createGraphics();
         g2d.setColor(color);
         g2d.setStroke(stroke);
         for (Integer pngBarOffset : barOffsets) {
             g2d.drawLine(pngBarOffset, 0, pngBarOffset, image.getHeight());
         }
+    }
+
+    public byte[] image2bytes() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(image, "png", baos);
         return baos.toByteArray();

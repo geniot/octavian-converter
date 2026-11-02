@@ -1,8 +1,5 @@
-package io.github.geniot.octavian.converter.web;
+package io.github.geniot.octavian.converter;
 
-import io.github.geniot.octavian.converter.ConversionRequest;
-import io.github.geniot.octavian.converter.ConversionResponse;
-import io.github.geniot.octavian.converter.OctavianConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

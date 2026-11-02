@@ -56,16 +56,16 @@ public class OctavianConverter {
         tune.setSheetHeight(pngHandler.image.getHeight());
         tune.setSheetWidth(pngHandler.image.getWidth());
         tune.setBarOffsets(toInts(svgHandler.getBarOffsets()));
-        tune.setPlayHeadWidth(svgHandler.getPlayHeadWidth());
+        tune.setPlayHeadWidth(svgHandler.getPlayHeadWidth() + 1);
 
         IndexedTreeMap<Integer, Point> points = new IndexedTreeMap<>();
         pointsHandler.addPoints(points, midiRoot, svgHandler.geNoteOffsets());
         pointsHandler.setOffsetsToOffPoints(new ArrayList<>(points.values()), tune.getSheetWidth());
-//            pointsHandler.setBars(points, barOffsets);
+        pointsHandler.setBars(points, tune.getBarOffsets());
         tune.setPoints(points.sequencedValues().toArray(new Point[0]));
 
         response.setTune(tune);
-        response.setPngSheet(png);
+        response.setPngSheet(pngHandler.image2bytes());
 
         return response;
     }

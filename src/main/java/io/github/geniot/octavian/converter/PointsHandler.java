@@ -2,6 +2,7 @@ package io.github.geniot.octavian.converter;
 
 import io.github.geniot.indexedtreemap.IndexedTreeMap;
 import io.github.geniot.octavian.converter.json.Note;
+import io.github.geniot.octavian.converter.json.NoteType;
 import io.github.geniot.octavian.converter.json.Point;
 import io.github.geniot.octavian.converter.json.Tune;
 import io.github.geniot.octavian.converter.midi.MidiNote;
@@ -11,38 +12,40 @@ import io.github.geniot.octavian.converter.midi.MidiTrack;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.SortedSet;
 
 public class PointsHandler {
 
     public void addPoints(IndexedTreeMap<Integer, Point> points,
                           MidiRoot midiRoot,
                           Map<String, Integer> noteOffsets) throws Exception {
-        for (MidiTrack track : midiRoot.getTracks()) {
-            for (MidiNote note : track.getNotes()) {
-                int duration = (int) (note.getDuration() * 1000);
-                int onTime = (int) (note.getTime() * 1000);
-                int offTime = onTime + duration;
-                int value = note.getMidi();
+        for (int i = 0; i < midiRoot.getTracks().size(); i++) {
+            MidiTrack track = midiRoot.getTracks().get(i);
+            for (MidiNote midiNote : track.getNotes()) {
+                int duration = (int) (midiNote.getDuration() * 1000);
+                int onTimestamp = (int) (midiNote.getTime() * 1000);
+                int offTimestamp = onTimestamp + duration;
+                int midiValue = midiNote.getMidi();
 
-                Point onPoint = points.getOrDefault(onTime, new Point());
-                setOffsetX(onPoint, note, noteOffsets);
-                onPoint.setTimestamp(onTime);
+                Point onPoint = points.getOrDefault(onTimestamp, new Point());
+                setOffsetX(onPoint, midiNote, noteOffsets);
+                onPoint.setTimestamp(onTimestamp);
                 Note onNote = new Note();
+                onNote.setNoteType(i == 0 ? NoteType.RIGHT_HAND_NOTE : NoteType.LEFT_HAND_BASS);
                 onNote.setDuration(duration);
-                onNote.setNoteValue(value);
-                onNote.setNoteName(Constants.NOTE_NAME_MAP.get(value));
+                onNote.setNoteValue(midiValue);
+                onNote.setNoteName(Constants.NOTE_NAME_MAP.get(midiValue));
                 onPoint.getNotesOn().add(onNote);
 
-                Point offPoint = points.getOrDefault(offTime, new Point());
-                offPoint.setTimestamp(offTime);
+                Point offPoint = points.getOrDefault(offTimestamp, new Point());
+                offPoint.setTimestamp(offTimestamp);
                 Note offNote = new Note();
-                offNote.setNoteValue(value);
-                offNote.setNoteName(Constants.NOTE_NAME_MAP.get(value));
+                offNote.setNoteType(i == 0 ? NoteType.RIGHT_HAND_NOTE : NoteType.LEFT_HAND_BASS);
+                offNote.setNoteValue(midiValue);
+                offNote.setNoteName(Constants.NOTE_NAME_MAP.get(midiValue));
                 offPoint.getNotesOff().add(offNote);
 
-                points.put(onTime, onPoint);
-                points.put(offTime, offPoint);
+                points.put(onTimestamp, onPoint);
+                points.put(offTimestamp, offPoint);
             }
         }
     }
@@ -129,11 +132,11 @@ public class PointsHandler {
         return null;
     }
 
-    public void setBars(IndexedTreeMap<Integer, Point> points, SortedSet<Integer> barOffsets) {
+    public void setBars(IndexedTreeMap<Integer, Point> points, int[] barOffsets) {
         for (Point point : points.values()) {
-            int insertionPoint = Arrays.binarySearch(barOffsets.toArray(), point.getOffsetX());
+            int insertionPoint = Arrays.binarySearch(barOffsets, point.getOffsetX());
             insertionPoint = insertionPoint < 0 ? Math.abs(insertionPoint) - 1 : insertionPoint;
-            point.setBar(insertionPoint - 1);
+            point.setBar(insertionPoint);
         }
     }
 
