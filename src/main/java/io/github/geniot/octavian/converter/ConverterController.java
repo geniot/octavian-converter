@@ -14,6 +14,6 @@ public class ConverterController {
     @PostMapping(value = "/convert", consumes = {"application/json"})
     public @ResponseBody
     ConversionResponse convertVerovio(@RequestBody ConversionRequest request) throws Exception {
-        return octavianConverter.convert(request.getMuseXml());
+        return octavianConverter.convert(request.getMusicXml());
     }
 }

@@ -4,7 +4,6 @@ import io.github.geniot.indexedtreemap.IndexedTreeMap;
 import io.github.geniot.octavian.converter.json.Note;
 import io.github.geniot.octavian.converter.json.NoteType;
 import io.github.geniot.octavian.converter.json.Point;
-import io.github.geniot.octavian.converter.json.Tune;
 import io.github.geniot.octavian.converter.midi.MidiNote;
 import io.github.geniot.octavian.converter.midi.MidiRoot;
 import io.github.geniot.octavian.converter.midi.MidiTrack;
@@ -139,11 +138,4 @@ public class PointsHandler {
             point.setBar(insertionPoint);
         }
     }
-
-    public void scale(Tune tune, float scaleFactor) {
-        for (int i = 0; i < tune.getBarOffsets().length; i++) {
-            tune.getBarOffsets()[i] /= (int) scaleFactor;
-        }
-    }
-
 }

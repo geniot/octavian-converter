@@ -48,7 +48,7 @@ public class OctavianConverter {
         meiHandler.setIdsToMidiNotes(midiRoot);
 
         Tune tune = new Tune();
-        String[] titleAndAuthor = musicXmlHandler.getTitleAndAuthor(xml);
+        String[] titleAndAuthor = musicXmlHandler.getTitleAndAuthor();
         tune.setTitle(titleAndAuthor[0]);
         tune.setAuthor(titleAndAuthor[1]);
         tune.setPngHeight(pngHandler.image.getHeight());
