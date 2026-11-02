@@ -50,7 +50,7 @@ public class SvgHandler extends AbstractHandler {
         Node pageMarginNode = (Node) xpath.compile("//g[@class='system']/path").evaluate(document, XPathConstants.NODE);
         String d = pageMarginNode.getAttributes().getNamedItem("d").getNodeValue();
         //for d="M13 540 L13 3060" parse "13"
-        int value = Integer.parseInt(d.split(" ")[0].substring(1));
+        int value = Integer.parseInt(d.substring(0, d.indexOf(' ')).substring(1));
         svgBarOffsets.add(scale(value, shift));
 
         return svgBarOffsets;
