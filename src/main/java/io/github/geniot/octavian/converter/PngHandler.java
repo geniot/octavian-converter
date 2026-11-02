@@ -1,42 +1,18 @@
 package io.github.geniot.octavian.converter;
 
-import io.sf.carte.echosvg.transcoder.TranscoderInput;
-import io.sf.carte.echosvg.transcoder.TranscoderOutput;
-import io.sf.carte.echosvg.transcoder.TranscodingHints;
-import io.sf.carte.echosvg.transcoder.image.PNGTranscoder;
-import org.jspecify.annotations.NonNull;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.util.SortedSet;
 
 public class PngHandler {
-    public byte @NonNull [] getPngBytes(byte[] svg) throws Exception {
-        long time = System.currentTimeMillis();
-        PNGTranscoder pngTranscode = new PNGTranscoder();
-        TranscodingHints hints = new TranscodingHints();
-        hints.put(PNGTranscoder.KEY_HEIGHT, 1000F);
-        pngTranscode.setTranscodingHints(hints);
-        InputStream in = new ByteArrayInputStream(svg);
-        TranscoderInput tIn = new TranscoderInput(in);
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        TranscoderOutput tOut = new TranscoderOutput(os);
-        pngTranscode.transcode(tIn, tOut);
-        os.flush();
-        os.close();
-        byte[] bbs = os.toByteArray();
-        System.out.println("SVG->PNG took: " + (System.currentTimeMillis() - time));
-        return bbs;
-    }
+    public final BufferedImage image;
 
-    public Dimension getPngDimension(byte[] bbs) throws Exception {
-        BufferedImage image = ImageIO.read(new ByteArrayInputStream(bbs));
-        return new Dimension(image.getWidth(), image.getHeight());
+    public PngHandler(byte[] png) throws Exception{
+        this.image = ImageIO.read(new ByteArrayInputStream(png));
     }
 
     public byte[] crop(byte[] bbs) throws Exception {
@@ -77,10 +53,6 @@ public class PngHandler {
         }
 
         return image.getSubimage(minX, minY, maxX - minX + 1, maxY - minY + 1);
-    }
-
-    public byte[] svg2png(byte[] svg) throws Exception {
-        return crop(getPngBytes(svg));
     }
 
     public byte[] debugLines(byte[] bbs, SortedSet<Integer> barOffsets, Color color, BasicStroke stroke) throws Exception {

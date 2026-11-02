@@ -1,101 +1,75 @@
 package io.github.geniot.octavian.converter;
 
-import io.github.geniot.octavian.converter.svg.SvgRoot;
-import io.github.geniot.octavian.converter.svg.Use;
-import org.apache.commons.lang3.tuple.Pair;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import java.awt.*;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class SvgHandler extends AbstractHandler {
     static Logger logger = LoggerFactory.getLogger(SvgHandler.class);
-    private final PngHandler pngHandler = new PngHandler();
 
-    private static final String TEMPLATE = """
-            <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-            <svg xmlns="http://www.w3.org/2000/svg"  overflow="visible" version="1.1" width="${width}px" height="${height}px">
-                <svg viewBox="0 0 ${width}0 ${height}0">
-                    <g transform="translate(300, 300) scale(${scale_x}, ${scale_y})">
-                        <path d="${path}"/>
-                    </g>
-                </svg>
-            </svg>""";
+    public SvgHandler(String xml) throws Exception {
+        super(xml);
+    }
 
-    public @NonNull SortedSet<Integer> getBarOffsets(SvgRoot svgRoot, Dimension pngDimension) {
-        SortedSet<Integer> svgBarOffsets = svgRoot.definitionScale.pageMargin.svgSystem.geBarOffsets();
-        svgBarOffsets.removeLast();
-        if (svgRoot.definitionScale.pageMargin.svgSystem.getMeasures().size() != svgBarOffsets.size()) {
-            logger.error("Svg Bar Offsets size mismatch");
+    public Map<String, Integer> geNoteOffsets() throws Exception {
+        long shift = getShiftX();
+        Map<String, Integer> svgNoteOffsets = new HashMap<>();
+        NodeList searchResultsList = (NodeList) xpath.compile("//g[@class='note bounding-box']/rect").evaluate(document, XPathConstants.NODESET);
+        for (int i = 0; i < searchResultsList.getLength(); i++) {
+            Node n = searchResultsList.item(i);
+            String id = n.getParentNode().getAttributes().getNamedItem("id").getTextContent().split("-")[1];
+            int x = Integer.parseInt(n.getAttributes().getNamedItem("x").getNodeValue());
+            svgNoteOffsets.put(id, scale(x, shift));
         }
-        return getOffsetsScaled(svgRoot, svgBarOffsets, pngDimension);
+        return svgNoteOffsets;
     }
 
-    public @NonNull SortedSet<Integer> getNoteOffsets(SvgRoot svgRoot, Dimension pngDimension) {
-        Map<String, Integer> svgBarOffsetsMap = svgRoot.definitionScale.pageMargin.svgSystem.geNoteOffsets();
-        SortedSet<Integer> noteOffsets = new TreeSet<>(svgBarOffsetsMap.values());
-        return getOffsetsScaled(svgRoot, noteOffsets, pngDimension);
-    }
-
-    private @NonNull SortedSet<Integer> getOffsetsScaled(SvgRoot svgRoot, SortedSet<Integer> svgBarOffsets, Dimension pngDimension) {
-        Pair<Long, Long> translation = svgRoot.definitionScale.pageMargin.getTranslation();
-        Rectangle viewBox = svgRoot.definitionScale.getViewBox();
-        SortedSet<Integer> pngBarOffsets = new TreeSet<>();
-        for (Integer svgBarOffset : svgBarOffsets) {
-            long pngBarOffset = pngDimension.width * (svgBarOffset + translation.getLeft()) / viewBox.width;
-            pngBarOffsets.add((int) pngBarOffset);
+    public SortedSet<Integer> getBarOffsets() throws Exception {
+        long shift = getShiftX();
+        SortedSet<Integer> svgBarOffsets = new TreeSet<>();
+        NodeList searchResultsList = (NodeList) xpath.compile("//g[@class='barLine bounding-box']/rect").evaluate(document, XPathConstants.NODESET);
+        for (int i = 0; i < searchResultsList.getLength(); i++) {
+            Node n = searchResultsList.item(i);
+            int value = Integer.parseInt(n.getAttributes().getNamedItem("x").getNodeValue());
+            svgBarOffsets.add(scale(value, shift));
         }
-        return pngBarOffsets;
+        svgBarOffsets.removeLast();//octavian does not need it
+        //insert first
+        Node pageMarginNode = (Node) xpath.compile("//g[@class='system']/path").evaluate(document, XPathConstants.NODE);
+        String d = pageMarginNode.getAttributes().getNamedItem("d").getNodeValue();
+        //for d="M13 540 L13 3060" parse "13"
+        int value = Integer.parseInt(d.split(" ")[0].substring(1));
+        svgBarOffsets.add(scale(value, shift));
+
+        return svgBarOffsets;
     }
 
-
-    public byte[] svg2xml(byte[] svg) throws Exception {
-        InputStream inputStream = new ByteArrayInputStream(svg);
-        Document document = docBuilder.parse(inputStream);
-        renameElement(document, document.getDocumentElement());
-        String result = document2string(document);
-        return result.replace("xmlns=\"http://www.w3.org/2000/svg\"", "").getBytes(StandardCharsets.UTF_8);
+    private int scale(int offset, long shift) throws Exception {
+        return (int) ((offset + shift) * 0.1);
     }
 
-    private void renameElement(Document document, Element element) {
-        if (element.hasAttribute("class")) {
-            String newTagName = element.getAttribute("class").replace("-", "_").replace(" ", "_");
-            document.renameNode(element, null, newTagName);
-        }
-        NodeList children = element.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            Node child = children.item(i);
-            if (child instanceof Element) {
-                renameElement(document, (Element) child);
-            }
-        }
+    /**
+     * transform='translate(260, 0)'
+     *
+     * @return 260
+     * @throws Exception
+     */
+    private long getShiftX() throws Exception {
+        Node pageMarginNode = (Node) xpath.compile("//g[@class='page-margin']").evaluate(document, XPathConstants.NODE);
+        String translate = pageMarginNode.getAttributes().getNamedItem("transform").getNodeValue();
+        return Integer.parseInt(translate.split("\\(")[1].split(",")[0]);
     }
 
-    public byte[] mei2svg(byte[] meiBbs) throws Exception {
-        List<String> args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data",
-                "--page-margin-bottom", "0", "--page-margin-top", "0", "--page-margin-left", "26", "--page-margin-right", "0",
-                "--spacing-linear", "0.40", "--breaks", "none", "--output-to", "svg", "--input-from", "mei"));
-        String svg = new String(runProcess(args, meiBbs, ".mei", ".svg", "--outfile", true, true), StandardCharsets.UTF_8);
-        svg = fixSvg(svg);
-        return svg.getBytes(StandardCharsets.UTF_8);
-    }
-
-    public String fixSvg(String svg) throws Exception {
-        svg = svg.replace("font-style:italic;", "font-style:normal;");
-        InputStream inputStream = new ByteArrayInputStream(svg.getBytes(StandardCharsets.UTF_8));
-        Document document = docBuilder.parse(inputStream);
+    public void fix() throws Exception {
+//        svg = svg.replace("font-style:italic;", "font-style:normal;");
         removeByXPath("//g[@class='pgFoot autogenerated']", document, xpath);
         removeByXPath("//g[@class='section placeholder systemMilestone']", document, xpath);
         removeByXPath("//g[@class='sb placeholder']", document, xpath);
@@ -105,11 +79,6 @@ public class SvgHandler extends AbstractHandler {
         removeByXPath("//g[@class='score pageMilestone']", document, xpath);
         removeByXPath("//g[contains(@class, 'pageMilestoneEnd')]", document, xpath);
         removeByXPath("//g[contains(@class, 'systemMilestoneEnd')]", document, xpath);
-        fixMeasureNumberFont(document, xpath);
-        return document2string(document);
-    }
-
-    private void fixMeasureNumberFont(Document document, XPath xpath) throws Exception {
         NodeList searchResultsList = (NodeList) xpath.compile("//tspan").evaluate(document, XPathConstants.NODESET);
         for (int i = 0; i < searchResultsList.getLength(); i++) {
             Node n = searchResultsList.item(i);
@@ -117,27 +86,67 @@ public class SvgHandler extends AbstractHandler {
         }
     }
 
-    public int getPlayHeadWidth(SvgRoot svgRoot) throws Exception {
-        Rectangle rec = svgRoot.definitionScale.getViewBox();
-        String width = String.valueOf(rec.width / 10);
-        String height = String.valueOf(rec.height / 10);
-        Map<String, Use> noteHeadHrefs = svgRoot.definitionScale.pageMargin.svgSystem.getNoteHeadHrefs();
-        int maxPlayHeadWidth = 20;
-        for (String href : noteHeadHrefs.keySet()) {
-            String path = svgRoot.defs.getPathByHref(href);
-            String scaleX = String.valueOf(noteHeadHrefs.get(href).getScaleX());
-            String scaleY = String.valueOf(noteHeadHrefs.get(href).getScaleY());
-            String template = TEMPLATE
-                    .replaceAll("\\$\\{path}", path)
-                    .replaceAll("\\$\\{width}", width)
-                    .replaceAll("\\$\\{height}", height)
-                    .replaceAll("\\$\\{scale_x}", scaleX)
-                    .replaceAll("\\$\\{scale_y}", scaleY);
-            byte[] png = pngHandler.svg2png(template.getBytes(StandardCharsets.UTF_8));
-//            Files.write(Path.of("tmp/" + href + ".png"), png);
-            Dimension dimension = pngHandler.getPngDimension(png);
-            maxPlayHeadWidth = Math.max(maxPlayHeadWidth, dimension.width);
+    public int getPlayHeadWidth() throws Exception {
+        int playHeadWidth = 0;
+        NodeList searchResultsList = (NodeList) xpath.compile("//g[@class='note bounding-box']/rect").evaluate(document, XPathConstants.NODESET);
+        for (int i = 0; i < searchResultsList.getLength(); i++) {
+            Node n = searchResultsList.item(i);
+            int width = Integer.parseInt(n.getAttributes().getNamedItem("width").getNodeValue());
+            playHeadWidth = Math.max(playHeadWidth, width);
         }
-        return maxPlayHeadWidth;
+        return (int) (playHeadWidth * 0.1);
     }
+
+
+//    public int getPlayHeadWidth(SvgRoot svgRoot) throws Exception {
+//        Rectangle rec = svgRoot.definitionScale.getViewBox();
+//        String width = String.valueOf(rec.width / 10);
+//        String height = String.valueOf(rec.height / 10);
+//        Map<String, Use> noteHeadHrefs = svgRoot.definitionScale.pageMargin.svgSystem.getNoteHeadHrefs();
+//        int maxPlayHeadWidth = 20;
+//        for (String href : noteHeadHrefs.keySet()) {
+//            String path = svgRoot.defs.getPathByHref(href);
+//            String scaleX = String.valueOf(noteHeadHrefs.get(href).getScaleX());
+//            String scaleY = String.valueOf(noteHeadHrefs.get(href).getScaleY());
+//            String template = TEMPLATE
+//                    .replaceAll("\\$\\{path}", path)
+//                    .replaceAll("\\$\\{width}", width)
+//                    .replaceAll("\\$\\{height}", height)
+//                    .replaceAll("\\$\\{scale_x}", scaleX)
+//                    .replaceAll("\\$\\{scale_y}", scaleY);
+//            byte[] png = pngHandler.svg2png(template.getBytes(StandardCharsets.UTF_8));
+////            Files.write(Path.of("tmp/" + href + ".png"), png);
+//            Dimension dimension = pngHandler.getPngDimension(png);
+//            maxPlayHeadWidth = Math.max(maxPlayHeadWidth, dimension.width);
+//        }
+//        return maxPlayHeadWidth;
+//    }
+//
+//    public SortedSet<Integer> scale(SortedSet<Integer> offsets, double scale, long shift) {
+//        SortedSet<Integer> scaledBarOffsets = new TreeSet<>();
+//        for (Integer barOffset : offsets) {
+//            scaledBarOffsets.add((int) ((barOffset + shift) * scale));
+//        }
+//        return scaledBarOffsets;
+//    }
+
+    //    public @NonNull SortedSet<Integer> getNoteOffsets(SvgRoot svgRoot) {
+//        Map<String, Integer> svgBarOffsetsMap = svgRoot.definitionScale.pageMargin.svgSystem.geNoteOffsets();
+//        return new TreeSet<>(svgBarOffsetsMap.values());
+//    }
+
+
+//    private void renameElement(Document document, Element element) {
+//        if (element.hasAttribute("class")) {
+//            String newTagName = element.getAttribute("class").replace("-", "_").replace(" ", "_");
+//            document.renameNode(element, null, newTagName);
+//        }
+//        NodeList children = element.getChildNodes();
+//        for (int i = 0; i < children.getLength(); i++) {
+//            Node child = children.item(i);
+//            if (child instanceof Element) {
+//                renameElement(document, (Element) child);
+//            }
+//        }
+//    }
 }

@@ -14,10 +14,10 @@ import java.io.Serializable;
         "author",
         "pngWidth",
         "pngHeight",
-        "selectionRanges",
         "sheetWidth",
         "sheetHeight",
         "playHeadWidth",
+        "selectionRanges",
         "barOffsets",
         "points"
 })
@@ -27,10 +27,10 @@ public class Tune implements Serializable {
     private String author;
     int pngWidth;
     int pngHeight;
-    private int[] selectionRanges;
     private int sheetWidth;
     private int sheetHeight;
     private int playHeadWidth;
+    private int[] selectionRanges;
     private int[] barOffsets;
     private Point[] points;
 }

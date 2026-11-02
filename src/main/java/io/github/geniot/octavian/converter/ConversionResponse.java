@@ -6,8 +6,5 @@ import lombok.Data;
 @Data
 public class ConversionResponse {
     byte[] pngSheet;
-    byte[] mp3;
     Tune tune;
-    int pngWidth;
-    int pngHeight;
 }

@@ -12,6 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MusicXmlHandler extends AbstractHandler {
+
+    public MusicXmlHandler(String xml) throws Exception {
+        super(xml);
+    }
+
+    @Override
+    void fix() throws Exception {
+        //nothing to fix
+    }
+
     public String[] getTitleAndAuthor(String musicXml) throws Exception {
         List<String> titleAndAuthor = new ArrayList<>();
         InputStream inputStream = new ByteArrayInputStream(musicXml.getBytes(StandardCharsets.UTF_8));

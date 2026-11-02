@@ -1,5 +1,7 @@
 package io.github.geniot.octavian.converter;
 
+import io.github.geniot.octavian.converter.midi.MidiNote;
+import io.github.geniot.octavian.converter.midi.MidiRoot;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -7,24 +9,14 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class MeiHandler extends AbstractHandler {
-    public byte[] xml2mei(byte[] xmlBbs) throws Exception {
-        List<String> args = new ArrayList<>(Arrays.asList("./verovio", "-r", "data", "--expand-always", "--breaks", "none", "--output-to", "mei", "--input-from", "xml"));
-        String mei = new String(runProcess(args, xmlBbs, ".xml", ".mei", "--outfile", true, true), StandardCharsets.UTF_8);
-        mei = fixMei(mei);
-        return mei.getBytes(StandardCharsets.UTF_8);
+
+    public MeiHandler(String xml) throws Exception {
+        super(xml);
     }
 
-    private String fixMei(String museXml) throws Exception {
-        InputStream inputStream = new ByteArrayInputStream(museXml.getBytes(StandardCharsets.UTF_8));
-        Document document = docBuilder.parse(inputStream);
+    void fix() throws Exception {
         removeByXPath("//fing", document, xpath);//fingering
         removeByXPath("//reh", document, xpath);//rehearsal marks
         removeByXPath("//pgHead/rend/text()", document, xpath);
@@ -39,7 +31,6 @@ public class MeiHandler extends AbstractHandler {
         replaceEndingsWithSections(document, xpath);
         addRightEndToLastMeasure(document, xpath);
         addMeasureNumbers(document, xpath);
-        return document2string(document);
     }
 
     private void replaceEndingsWithSections(Document node, XPath xpath) throws Exception {
@@ -88,5 +79,32 @@ public class MeiHandler extends AbstractHandler {
             prev = prev.getPreviousSibling();
         }
         return prev;
+    }
+
+    public void setIdsToMidiNotes(MidiRoot midiRoot) throws Exception {
+        for (int i = 0; i < midiRoot.getTracks().size(); i++) {
+            NodeList searchResultsList = (NodeList) xpath.compile("//staff[@n='" + (i + 1) + "']//note").evaluate(document, XPathConstants.NODESET);
+            for (int j = 0; j < midiRoot.getTracks().get(i).getNotes().size(); j++) {
+                MidiNote midiNote = midiRoot.getTracks().get(i).getNotes().get(j);
+                Node meiNode = searchResultsList.item(j);
+                String meiOct = meiNode.getAttributes().getNamedItem("oct").getNodeValue();
+                String meiPName = meiNode.getAttributes().getNamedItem("pname").getNodeValue();
+                String meiId = meiNode.getAttributes().getNamedItem("xml:id").getNodeValue();
+                meiId = meiId.contains("-") ? meiId.substring(0, meiId.indexOf("-")) : meiId;
+                String midiNoteName = simplifyNoteName(midiNote);
+                if (!midiNoteName.equals(meiPName + meiOct)) {
+                    throw new Exception("Invalid note name: " + midiNoteName);
+                } else {
+                    midiNote.setId(meiId);
+                }
+            }
+        }
+    }
+
+
+    private String simplifyNoteName(MidiNote midiNote) {
+        String name = midiNote.getName();
+        int length = name.length();
+        return (name.charAt(0) + String.valueOf(name.charAt(length - 1))).toLowerCase();
     }
 }

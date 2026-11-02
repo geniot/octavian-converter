@@ -1,13 +1,17 @@
 package io.github.geniot.octavian.converter;
 
+import io.github.geniot.indexedtreemap.IndexedTreeMap;
+import io.github.geniot.octavian.converter.json.Point;
+import io.github.geniot.octavian.converter.json.Tune;
+import io.github.geniot.octavian.converter.midi.MidiRoot;
 import lombok.Data;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.json.JsonMapper;
 
-import java.io.FileOutputStream;
-import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.SortedSet;
 
 
 /**
@@ -20,45 +24,60 @@ import java.nio.charset.StandardCharsets;
 public class OctavianConverter {
     static Logger logger = LoggerFactory.getLogger(OctavianConverter.class);
 
-    MidiHandler midiHandler = new MidiHandler();
-    SvgHandler svgHandler = new SvgHandler();
-    PngHandler pngHandler = new PngHandler();
-    MeiHandler meiHandler = new MeiHandler();
-
+    ProcessStarter processStarter = new ProcessStarter();
+    PointsHandler pointsHandler = new PointsHandler();
+    JsonMapper jsonMapper = new JsonMapper();
 
     public ConversionResponse convert(String xml) throws Exception {
         ConversionResponse response = new ConversionResponse();
-        //XML
-        IOUtils.write(xml, new FileOutputStream("tmp/out.xml"), StandardCharsets.UTF_8);
 
-        //XML->MIDI (musescore)
-        byte[] midi = midiHandler.xml2midi(xml.getBytes(StandardCharsets.UTF_8));
-        IOUtils.write(midi, new FileOutputStream("tmp/out.mid"));
-        //MIDI->JSON (midi2json)
-        byte[] json = midiHandler.midi2json(midi);
-        IOUtils.write(json, new FileOutputStream("tmp/out.json"));
+        MusicXmlHandler musicXmlHandler = new MusicXmlHandler(xml);
 
-        //XML->MP3
-//        byte[] mp3 = midiHandler.xml2mp3(xml.getBytes(StandardCharsets.UTF_8));
-//        IOUtils.write(mp3, new FileOutputStream("tmp/out.mp3"));
+        String mei = processStarter.xml2mei(musicXmlHandler.document2string());
+        MeiHandler meiHandler = new MeiHandler(mei);
 
-        //XML->MEI (verovio)
-        byte[] mei = meiHandler.xml2mei(xml.getBytes(StandardCharsets.UTF_8));
-        IOUtils.write(mei, new FileOutputStream("tmp/out.mei"));
+        String svg = processStarter.mei2svg(meiHandler.document2string());
+        SvgHandler svgHandler = new SvgHandler(svg);
 
-        //MEI->SVG (verovio)
-        byte[] svg = svgHandler.mei2svg(mei);
-        IOUtils.write(svg, new FileOutputStream("tmp/out.svg"));
+        byte[] png = processStarter.getPngBytes(svgHandler.document2string());
+        PngHandler pngHandler = new PngHandler(png);
 
-        //SVG->SVG_XML (java)
-        byte[] svgXml = svgHandler.svg2xml(svg);
-        IOUtils.write(svgXml, new FileOutputStream("tmp/out_svg.xml"));
+        byte[] midi = processStarter.xml2midi(musicXmlHandler.document2string());
+        String midiJson = processStarter.midi2json(midi);
+        MidiRoot midiRoot = jsonMapper.readValue(midiJson, MidiRoot.class);
+        meiHandler.setIdsToMidiNotes(midiRoot);
 
-        //SVG->PNG (echosvg)
-        byte[] png = pngHandler.svg2png(svg);
-        IOUtils.write(png, new FileOutputStream("tmp/out.png"));
+        Tune tune = new Tune();
+        String[] titleAndAuthor = musicXmlHandler.getTitleAndAuthor(xml);
+        tune.setTitle(titleAndAuthor[0]);
+        tune.setAuthor(titleAndAuthor[1]);
+        tune.setPngHeight(pngHandler.image.getHeight());
+        tune.setPngWidth(pngHandler.image.getWidth());
+        tune.setSheetHeight(pngHandler.image.getHeight());
+        tune.setSheetWidth(pngHandler.image.getWidth());
+        tune.setBarOffsets(toInts(svgHandler.getBarOffsets()));
+        tune.setPlayHeadWidth(svgHandler.getPlayHeadWidth());
+
+        IndexedTreeMap<Integer, Point> points = new IndexedTreeMap<>();
+        pointsHandler.addPoints(points, midiRoot, svgHandler.geNoteOffsets());
+        pointsHandler.setOffsetsToOffPoints(new ArrayList<>(points.values()), tune.getSheetWidth());
+//            pointsHandler.setBars(points, barOffsets);
+        tune.setPoints(points.sequencedValues().toArray(new Point[0]));
+
+        response.setTune(tune);
+        response.setPngSheet(png);
 
         return response;
+    }
+
+
+    private static int[] toInts(SortedSet<Integer> barOffsets) {
+        int[] ints = new int[barOffsets.size()];
+        int counter = 0;
+        for (Integer i : barOffsets) {
+            ints[counter++] = i;
+        }
+        return ints;
     }
 
 
