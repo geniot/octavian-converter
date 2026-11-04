@@ -36,6 +36,19 @@ public class SvgHandler extends AbstractHandler {
         return svgNoteOffsets;
     }
 
+
+    public SortedSet<Integer> getSelectionRanges() throws Exception {
+        long shift = getShiftX();
+        SortedSet<Integer> svgRehearsalNoteOffsets = new TreeSet<>();
+        NodeList searchResultsList = (NodeList) xpath.compile("//g[@class='note' and starts-with(@id,'reh-')]/g[@class='note bounding-box']/rect").evaluate(document, XPathConstants.NODESET);
+        for (int i = 0; i < searchResultsList.getLength(); i++) {
+            Node n = searchResultsList.item(i);
+            int value = Integer.parseInt(n.getAttributes().getNamedItem("x").getNodeValue());
+            svgRehearsalNoteOffsets.add(scale(value, shift));
+        }
+        return svgRehearsalNoteOffsets;
+    }
+
     public SortedSet<Integer> getBarOffsets() throws Exception {
         long shift = getShiftX();
         SortedSet<Integer> svgBarOffsets = new TreeSet<>();

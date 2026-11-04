@@ -39,6 +39,7 @@ public class OctavianConverter {
 
         String svg = processStarter.mei2svg(meiHandler.document2string());
         SvgHandler svgHandler = new SvgHandler(svg);
+//        FileUtils.write(new File("tmp/out.svg"), svgHandler.document2string(), StandardCharsets.UTF_8);
 
         byte[] png = processStarter.getPngBytes(svgHandler.document2string());
         PngHandler pngHandler = new PngHandler(png);
@@ -57,6 +58,7 @@ public class OctavianConverter {
         tune.setSheetHeight(pngHandler.image.getHeight());
         tune.setSheetWidth(pngHandler.image.getWidth());
         tune.setBarOffsets(toInts(svgHandler.getBarOffsets()));
+        tune.setSelectionRanges(toInts(svgHandler.getSelectionRanges()));
         tune.setPlayHeadWidth(svgHandler.getPlayHeadWidth() + 1);
 
         IndexedTreeMap<Integer, Point> points = new IndexedTreeMap<>();
