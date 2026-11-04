@@ -26,5 +26,5 @@ public class Note implements Serializable {
     Integer noteValue;
     String noteName;
     String chordName;
-    Map<String, Finger> fingers;
+    Map<HandType, Finger> fingers;
 }
