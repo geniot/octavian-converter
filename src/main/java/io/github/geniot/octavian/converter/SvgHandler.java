@@ -17,6 +17,7 @@ public class SvgHandler extends AbstractHandler {
 
     public SvgHandler(String xml) throws Exception {
         super(xml);
+        this.fix();
     }
 
     public Map<String, Integer> geNoteOffsets() throws Exception {

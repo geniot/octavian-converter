@@ -29,6 +29,7 @@ public class PointsHandler {
                 setOffsetX(onPoint, midiNote, noteOffsets);
                 onPoint.setTimestamp(onTimestamp);
                 Note onNote = new Note();
+                onNote.setId(midiNote.getId());
                 onNote.setNoteType(i == 0 ? NoteType.RIGHT_HAND_NOTE : NoteType.LEFT_HAND_BASS);
                 onNote.setDuration(duration);
                 onNote.setNoteValue(midiValue);
@@ -38,6 +39,7 @@ public class PointsHandler {
                 Point offPoint = points.getOrDefault(offTimestamp, new Point());
                 offPoint.setTimestamp(offTimestamp);
                 Note offNote = new Note();
+                offNote.setId(midiNote.getId());
                 offNote.setNoteType(i == 0 ? NoteType.RIGHT_HAND_NOTE : NoteType.LEFT_HAND_BASS);
                 offNote.setNoteValue(midiValue);
                 offNote.setNoteName(Constants.NOTE_NAME_MAP.get(midiValue));

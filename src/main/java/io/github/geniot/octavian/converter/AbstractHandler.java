@@ -46,10 +46,7 @@ public abstract class AbstractHandler {
         transformer = transformerFactory.newTransformer();
         InputStream inputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
         this.document = docBuilder.parse(inputStream);
-        this.fix();
     }
-
-    abstract void fix() throws Exception;
 
     public String document2string() throws Exception {
         DOMSource source = new DOMSource(document);

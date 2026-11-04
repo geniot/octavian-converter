@@ -1,5 +1,6 @@
 package io.github.geniot.octavian.converter;
 
+import io.github.geniot.octavian.converter.json.*;
 import io.github.geniot.octavian.converter.midi.MidiNote;
 import io.github.geniot.octavian.converter.midi.MidiRoot;
 import org.w3c.dom.Document;
@@ -9,11 +10,16 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MeiHandler extends AbstractHandler {
 
-    public MeiHandler(String xml) throws Exception {
+    public MeiHandler(String xml, boolean shouldFix) throws Exception {
         super(xml);
+        if (shouldFix) {
+            this.fix();
+        }
     }
 
     void fix() throws Exception {
@@ -31,6 +37,30 @@ public class MeiHandler extends AbstractHandler {
         replaceEndingsWithSections(document, xpath);
         addRightEndToLastMeasure(document, xpath);
         addMeasureNumbers(document, xpath);
+    }
+
+    public void setFingeringToTune(Tune tune) throws Exception {
+        NodeList searchResultsList = (NodeList) xpath.compile("//fing").evaluate(document, XPathConstants.NODESET);
+        for (int i = 0; i < searchResultsList.getLength(); i++) {
+            Node n = searchResultsList.item(i);
+            String id = n.getAttributes().getNamedItem("startid").getTextContent().substring(1);
+            String finger = n.getTextContent().trim();
+            Note onNote = findNoteById(tune, id);
+            Map<HandType, Finger> map = new HashMap<>();
+            map.put(onNote.getNoteType().equals(NoteType.RIGHT_HAND_NOTE) ? HandType.PIANO_RIGHT_HAND : HandType.PIANO_LEFT_HAND, new Finger(finger, null));
+            onNote.setFingers(map);
+        }
+    }
+
+    private Note findNoteById(Tune tune, String noteId) throws Exception {
+        for (Point point : tune.getPoints()) {
+            for (Note note : point.getNotesOn()) {
+                if (note.getId().equals(noteId)) {
+                    return note;
+                }
+            }
+        }
+        throw new Exception("Could not find note for note id: " + noteId);
     }
 
     private void replaceEndingsWithSections(Document node, XPath xpath) throws Exception {

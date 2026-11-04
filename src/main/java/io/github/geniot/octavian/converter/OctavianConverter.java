@@ -35,7 +35,7 @@ public class OctavianConverter {
 //        FileUtils.write(new File("tmp/out.xml"), musicXmlHandler.document2string(), StandardCharsets.UTF_8);
 
         String mei = processStarter.xml2mei(musicXmlHandler.document2string());
-        MeiHandler meiHandler = new MeiHandler(mei);
+        MeiHandler meiHandler = new MeiHandler(mei, true);
 
         String svg = processStarter.mei2svg(meiHandler.document2string());
         SvgHandler svgHandler = new SvgHandler(svg);
@@ -66,6 +66,9 @@ public class OctavianConverter {
         pointsHandler.setOffsetsToOffPoints(new ArrayList<>(points.values()), tune.getSheetWidth());
         pointsHandler.setBars(points, tune.getBarOffsets());
         tune.setPoints(points.sequencedValues().toArray(new Point[0]));
+
+        MeiHandler meiOriginalHandler = new MeiHandler(mei, false);
+        meiOriginalHandler.setFingeringToTune(tune);
 
         response.setTune(tune);
         response.setPngSheet(pngHandler.image2bytes());

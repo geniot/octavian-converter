@@ -11,9 +11,9 @@ public class MusicXmlHandler extends AbstractHandler {
 
     public MusicXmlHandler(String xml) throws Exception {
         super(xml);
+        this.fix();
     }
 
-    @Override
     void fix() throws Exception {
         //add id to each note, prefix rehearsal starting notes with 'reh-', suffix '-rendN' will be added later by verovio when necessary
         NodeList searchResultsList = (NodeList) xpath.compile("//note").evaluate(document, XPathConstants.NODESET);
