@@ -42,10 +42,12 @@ public class OctavianConverter {
 
         String svg = processStarter.mei2svg(meiHandler.document2string());
         SvgHandler svgHandler = new SvgHandler(svg);
-//        FileUtils.write(new File("tmp/out.svg"), svgHandler.document2string(), StandardCharsets.UTF_8);
+        FileUtils.write(new File("tmp/out.svg"), svgHandler.document2string(), StandardCharsets.UTF_8);
 
         byte[] png = processStarter.getPngBytesEchoSvg(svgHandler.document2string());
+//        byte[] png = processStarter.getPngBytesJSVG(svgHandler.document2string());
         PngHandler pngHandler = new PngHandler(png);
+        FileUtils.writeByteArrayToFile(new File("tmp/out.png"), pngHandler.image2bytes());
 
         byte[] midi = processStarter.xml2midi(musicXmlHandler.document2string());
         FileUtils.writeByteArrayToFile(new File("tmp/out.mid"), midi);

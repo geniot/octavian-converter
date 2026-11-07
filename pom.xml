@@ -35,6 +35,17 @@
             <name>CSS4J repository</name>
             <url>https://css4j.github.io/maven/</url>
         </repository>
+        <repository>
+            <name>Central Portal Snapshots</name>
+            <id>central-portal-snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -88,7 +99,7 @@
         <dependency>
             <groupId>com.github.weisj</groupId>
             <artifactId>jsvg</artifactId>
-            <version>2.2.0</version>
+            <version>2.2.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
 

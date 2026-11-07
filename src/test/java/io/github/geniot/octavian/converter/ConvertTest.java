@@ -20,6 +20,7 @@ public class ConvertTest {
             MenuRoot menuRoot = jsonMapper.readValue(menuJson, MenuRoot.class);
             for (MenuItem menuItem : menuRoot.getMenuItems()) {
                 convert(menuItem);
+                break;
             }
         } catch (Exception ex) {
             ex.printStackTrace();

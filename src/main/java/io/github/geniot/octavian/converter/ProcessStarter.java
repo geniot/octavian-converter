@@ -84,10 +84,12 @@ public class ProcessStarter {
     }
 
     public byte[] getPngBytesJSVG(String svg) throws Exception {
+        svg = svg.replaceFirst("<style type=\"text/css\">", "<style type=\"text/css\">[stroke-width=\"0\"] { stroke: none !important };");
         long time = System.currentTimeMillis();
         SVGLoader loader = new SVGLoader();
         ByteArrayInputStream is = new ByteArrayInputStream(svg.getBytes(StandardCharsets.UTF_8));
         SVGDocument svgDocument = loader.load(is, null, LoaderContext.createDefault());
+
         FloatSize size = svgDocument.size();
         BufferedImage image = new BufferedImage((int) size.width, (int) size.height, BufferedImage.TYPE_INT_ARGB_PRE);
         Graphics2D g = image.createGraphics();

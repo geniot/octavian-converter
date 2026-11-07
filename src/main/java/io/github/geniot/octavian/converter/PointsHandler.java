@@ -57,7 +57,7 @@ public class PointsHandler {
             throw new Exception("Note id not found: " + note.getId());
         }
         if (onPoint.getOffsetX() != null && !onPoint.getOffsetX().equals(offset)) {
-            throw new Exception("Offset X or Offset X not equal: " + onPoint.getOffsetX());
+            throw new Exception("Offset X not equal: " + onPoint.getOffsetX());
         }
         onPoint.setOffsetX(offset);
     }

@@ -14,15 +14,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MeiHandler extends AbstractHandler {
+    private Map<String, String> tiesMap;
 
     public MeiHandler(String xml, boolean shouldFix) throws Exception {
         super(xml);
         if (shouldFix) {
             this.fix();
         }
+        this.initTiesMap();
     }
 
-    void fix() throws Exception {
+    private void initTiesMap() throws Exception {
+        NodeList tiesResultsList = (NodeList) xpath.compile("//tie").evaluate(document, XPathConstants.NODESET);
+        this.tiesMap = new HashMap<>();
+        for (int i = 0; i < tiesResultsList.getLength(); i++) {
+            Node n = tiesResultsList.item(i);
+            String startId = n.getAttributes().getNamedItem("startid").getTextContent().substring(1);
+            String endId = n.getAttributes().getNamedItem("endid").getTextContent().substring(1);
+            this.tiesMap.put(startId, endId);
+        }
+    }
+
+    private void fix() throws Exception {
         removeByXPath("//fing", document, xpath);//fingering
         removeByXPath("//reh", document, xpath);//rehearsal marks
         removeByXPath("//pgHead/rend/text()", document, xpath);
@@ -114,18 +127,27 @@ public class MeiHandler extends AbstractHandler {
     public void setIdsToMidiNotes(MidiRoot midiRoot) throws Exception {
         for (int i = 0; i < midiRoot.getTracks().size(); i++) {
             NodeList searchResultsList = (NodeList) xpath.compile("//staff[@n='" + (i + 1) + "']//note").evaluate(document, XPathConstants.NODESET);
+            int meiNoteCounter = 0;
             for (int j = 0; j < midiRoot.getTracks().get(i).getNotes().size(); j++) {
-                MidiNote midiNote = midiRoot.getTracks().get(i).getNotes().get(j);
-                Node meiNode = searchResultsList.item(j);
+
+                //skipping tied notes (not bound to audible notes)
+                if (this.tiesMap.containsValue(searchResultsList.item(meiNoteCounter).getAttributes().getNamedItem("xml:id").getNodeValue())) {
+                    ++meiNoteCounter;
+                }
+                Node meiNode = searchResultsList.item(meiNoteCounter);
+                String meiId = meiNode.getAttributes().getNamedItem("xml:id").getNodeValue();
                 String meiOct = meiNode.getAttributes().getNamedItem("oct").getNodeValue();
                 String meiPName = meiNode.getAttributes().getNamedItem("pname").getNodeValue();
-                String meiId = meiNode.getAttributes().getNamedItem("xml:id").getNodeValue();
+
+                MidiNote midiNote = midiRoot.getTracks().get(i).getNotes().get(j);
                 String midiNoteName = simplifyNoteName(midiNote);
+
                 if (!midiNoteName.equals(meiPName + meiOct)) {
                     throw new Exception("Invalid note name: " + midiNoteName + ";" + meiPName + ";" + meiOct);
                 } else {
                     midiNote.setId(meiId);
                 }
+                ++meiNoteCounter;
             }
         }
     }
