@@ -48,12 +48,13 @@ public class PngHandler {
         image = image.getSubimage(minX, minY, maxX - minX + 1, maxY - minY + 1);
     }
 
-    public void debugLines(SortedSet<Integer> barOffsets, Color color, BasicStroke stroke) {
+    public void debugLines(SortedSet<Integer> offsets, Color color, BasicStroke stroke) {
         Graphics2D g2d = image.createGraphics();
         g2d.setColor(color);
         g2d.setStroke(stroke);
-        for (Integer pngBarOffset : barOffsets) {
+        for (Integer pngBarOffset : offsets) {
             g2d.drawLine(pngBarOffset, 0, pngBarOffset, image.getHeight());
+            g2d.drawString(String.valueOf(pngBarOffset), pngBarOffset, 10);
         }
     }
 

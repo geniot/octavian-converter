@@ -47,6 +47,7 @@ public class OctavianConverter {
         byte[] png = processStarter.getPngBytesEchoSvg(svgHandler.document2string());
 //        byte[] png = processStarter.getPngBytesJSVG(svgHandler.document2string());
         PngHandler pngHandler = new PngHandler(png);
+//        pngHandler.debugLines(new TreeSet<>(svgHandler.geNoteOffsets().values()), Color.BLUE, new BasicStroke(1));
         FileUtils.writeByteArrayToFile(new File("tmp/out.png"), pngHandler.image2bytes());
 
         byte[] midi = processStarter.xml2midi(musicXmlHandler.document2string());

@@ -7,10 +7,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPathConstants;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 public class SvgHandler extends AbstractHandler {
     static Logger logger = LoggerFactory.getLogger(SvgHandler.class);
@@ -29,12 +26,38 @@ public class SvgHandler extends AbstractHandler {
             String idContent = n.getParentNode().getAttributes().getNamedItem("id").getTextContent();
             String id = idContent.substring(idContent.indexOf('-') + 1);//removing the prefix 'bbox-'
             int x = Integer.parseInt(n.getAttributes().getNamedItem("x").getNodeValue());
+
+            Node possibleChordParent = n.getParentNode().getParentNode().getParentNode();
+            if (possibleChordParent.getAttributes().getNamedItem("class").getNodeValue().equals("chord")) {
+                x = getChordOffset(possibleChordParent);
+            }
             if (svgNoteOffsets.containsKey(id)) {
                 throw new RuntimeException("Note id " + id + " already exists");
             }
             svgNoteOffsets.put(id, scale(x, shift));
         }
         return svgNoteOffsets;
+    }
+
+    /**
+     * Some chords have notes that are visually not aligned vertically on the same y-axis.
+     * Although these chord notes sound at the same time. This brings confusion for Octavian.
+     * To fix this we set the x-offset for all chord notes to the same value: where most of them stick to.
+     *
+     * @param chordNode
+     * @return
+     */
+    private int getChordOffset(Node chordNode) throws Exception {
+        NodeList rects = (NodeList) xpath.compile(".//g[@class='note bounding-box']/rect")
+                .evaluate(chordNode, XPathConstants.NODESET);
+
+        Map<Integer, Integer> offset2count = new TreeMap<>();
+        for (int i = 0; i < rects.getLength(); i++) {
+            int x = Integer.parseInt(rects.item(i).getAttributes().getNamedItem("x").getNodeValue());
+            offset2count.merge(x, 1, Integer::sum);
+        }
+
+        return Collections.max(offset2count.entrySet(), Map.Entry.comparingByValue()).getKey();
     }
 
 
