@@ -122,7 +122,7 @@ public class MeiHandler extends AbstractHandler {
                 String meiId = meiNode.getAttributes().getNamedItem("xml:id").getNodeValue();
                 String midiNoteName = simplifyNoteName(midiNote);
                 if (!midiNoteName.equals(meiPName + meiOct)) {
-                    throw new Exception("Invalid note name: " + midiNoteName);
+                    throw new Exception("Invalid note name: " + midiNoteName + ";" + meiPName + ";" + meiOct);
                 } else {
                     midiNote.setId(meiId);
                 }

@@ -1,5 +1,9 @@
 package io.github.geniot.octavian.converter;
 
+import com.github.weisj.jsvg.SVGDocument;
+import com.github.weisj.jsvg.parser.LoaderContext;
+import com.github.weisj.jsvg.parser.SVGLoader;
+import com.github.weisj.jsvg.view.FloatSize;
 import com.zaxxer.nuprocess.NuProcess;
 import com.zaxxer.nuprocess.NuProcessBuilder;
 import io.sf.carte.echosvg.transcoder.TranscoderInput;
@@ -8,6 +12,9 @@ import io.sf.carte.echosvg.transcoder.TranscodingHints;
 import io.sf.carte.echosvg.transcoder.image.PNGTranscoder;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -58,7 +65,7 @@ public class ProcessStarter {
         return new String(runProcess(args, midiBbs, ".mid", ".json", "", false, true), StandardCharsets.UTF_8);
     }
 
-    public byte[] getPngBytes(String svg) throws Exception {
+    public byte[] getPngBytesEchoSvg(String svg) throws Exception {
         long time = System.currentTimeMillis();
         PNGTranscoder pngTranscode = new PNGTranscoder();
         TranscodingHints hints = new TranscodingHints();
@@ -72,6 +79,25 @@ public class ProcessStarter {
         os.flush();
         os.close();
         byte[] bbs = os.toByteArray();
+        System.out.println("SVG->PNG took: " + (System.currentTimeMillis() - time));
+        return bbs;
+    }
+
+    public byte[] getPngBytesJSVG(String svg) throws Exception {
+        long time = System.currentTimeMillis();
+        SVGLoader loader = new SVGLoader();
+        ByteArrayInputStream is = new ByteArrayInputStream(svg.getBytes(StandardCharsets.UTF_8));
+        SVGDocument svgDocument = loader.load(is, null, LoaderContext.createDefault());
+        FloatSize size = svgDocument.size();
+        BufferedImage image = new BufferedImage((int) size.width, (int) size.height, BufferedImage.TYPE_INT_ARGB_PRE);
+        Graphics2D g = image.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+        svgDocument.render(null, g);
+        g.dispose();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", baos);
+        byte[] bbs = baos.toByteArray();
         System.out.println("SVG->PNG took: " + (System.currentTimeMillis() - time));
         return bbs;
     }

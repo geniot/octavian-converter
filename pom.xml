@@ -84,6 +84,14 @@
             <version>1.4.0</version>
         </dependency>
 
+        <!-- Source: https://mvnrepository.com/artifact/com.github.weisj/jsvg -->
+        <dependency>
+            <groupId>com.github.weisj</groupId>
+            <artifactId>jsvg</artifactId>
+            <version>2.2.0</version>
+            <scope>compile</scope>
+        </dependency>
+
         <!-- Source: https://mvnrepository.com/artifact/io.sf.carte/echosvg-all -->
         <dependency>
             <groupId>io.sf.carte</groupId>

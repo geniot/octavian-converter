@@ -5,11 +5,13 @@ import io.github.geniot.octavian.converter.json.Point;
 import io.github.geniot.octavian.converter.json.Tune;
 import io.github.geniot.octavian.converter.midi.MidiRoot;
 import lombok.Data;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.json.JsonMapper;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.SortedSet;
 
@@ -19,10 +21,10 @@ import java.util.SortedSet;
  * Input: MusicXML or MuseScore (.mscz, .mscx)
  * Output: MP3, PNG, json
  */
+@Slf4j
 @Data
 @Component
 public class OctavianConverter {
-    static Logger logger = LoggerFactory.getLogger(OctavianConverter.class);
 
     ProcessStarter processStarter = new ProcessStarter();
     PointsHandler pointsHandler = new PointsHandler();
@@ -36,16 +38,19 @@ public class OctavianConverter {
 
         String mei = processStarter.xml2mei(musicXmlHandler.document2string());
         MeiHandler meiHandler = new MeiHandler(mei, true);
+        FileUtils.write(new File("tmp/out.mei"), meiHandler.document2string(), StandardCharsets.UTF_8);
 
         String svg = processStarter.mei2svg(meiHandler.document2string());
         SvgHandler svgHandler = new SvgHandler(svg);
 //        FileUtils.write(new File("tmp/out.svg"), svgHandler.document2string(), StandardCharsets.UTF_8);
 
-        byte[] png = processStarter.getPngBytes(svgHandler.document2string());
+        byte[] png = processStarter.getPngBytesEchoSvg(svgHandler.document2string());
         PngHandler pngHandler = new PngHandler(png);
 
         byte[] midi = processStarter.xml2midi(musicXmlHandler.document2string());
+        FileUtils.writeByteArrayToFile(new File("tmp/out.mid"), midi);
         String midiJson = processStarter.midi2json(midi);
+        FileUtils.write(new File("tmp/out.json"), midiJson, StandardCharsets.UTF_8);
         MidiRoot midiRoot = jsonMapper.readValue(midiJson, MidiRoot.class);
         meiHandler.setIdsToMidiNotes(midiRoot);
 
