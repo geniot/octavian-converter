@@ -34,7 +34,7 @@ public class OctavianConverter {
         ConversionResponse response = new ConversionResponse();
 
         MusicXmlHandler musicXmlHandler = new MusicXmlHandler(xml);
-//        FileUtils.write(new File("tmp/out.xml"), musicXmlHandler.document2string(), StandardCharsets.UTF_8);
+        FileUtils.write(new File("tmp/out.xml"), musicXmlHandler.document2string(), StandardCharsets.UTF_8);
 
         String mei = processStarter.xml2mei(musicXmlHandler.document2string());
         MeiHandler meiHandler = new MeiHandler(mei, true);

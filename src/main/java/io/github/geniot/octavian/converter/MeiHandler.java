@@ -8,7 +8,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,20 +35,20 @@ public class MeiHandler extends AbstractHandler {
     }
 
     private void fix() throws Exception {
-        removeByXPath("//fing", document, xpath);//fingering
-        removeByXPath("//reh", document, xpath);//rehearsal marks
-        removeByXPath("//pgHead/rend/text()", document, xpath);
-        removeByXPath("//label/text()", document, xpath);
-        removeByXPath("//labelAbbr/text()", document, xpath);
-        removeByXPath("//tempo/text()", document, xpath);
-        removeByXPath("//tempo/rend/text()", document, xpath);
-        removeByXPath("//dir/text()", document, xpath);
-        removeByXPath("//measure/mNum", document, xpath);//we will add our own measure numbers
-        removeAttributeByXPath("//measure", document, xpath, "left");
-        removeAttributeByXPath("//measure", document, xpath, "right");
-        replaceEndingsWithSections(document, xpath);
-        addRightEndToLastMeasure(document, xpath);
-        addMeasureNumbers(document, xpath);
+        removeByXPath("//fing", document);//fingering
+        removeByXPath("//reh", document);//rehearsal marks
+        removeByXPath("//pgHead/rend/text()", document);
+        removeByXPath("//label/text()", document);
+        removeByXPath("//labelAbbr/text()", document);
+        removeByXPath("//tempo/text()", document);
+        removeByXPath("//tempo/rend/text()", document);
+        removeByXPath("//dir/text()", document);
+        removeByXPath("//measure/mNum", document);//we will add our own measure numbers
+        removeAttributeByXPath("//measure", document, "left");
+        removeAttributeByXPath("//measure", document, "right");
+        replaceEndingsWithSections(document);
+        addRightEndToLastMeasure(document);
+        addMeasureNumbers(document);
     }
 
     public void setFingeringToTune(Tune tune) throws Exception {
@@ -76,7 +75,7 @@ public class MeiHandler extends AbstractHandler {
         throw new Exception("Could not find note for note id: " + noteId);
     }
 
-    private void replaceEndingsWithSections(Document node, XPath xpath) throws Exception {
+    private void replaceEndingsWithSections(Document node) throws Exception {
         NodeList searchResultsList = (NodeList) xpath.compile("//ending").evaluate(node, XPathConstants.NODESET);
         for (int i = 0; i < searchResultsList.getLength(); i++) {
             Node n = searchResultsList.item(i);
@@ -97,13 +96,13 @@ public class MeiHandler extends AbstractHandler {
         }
     }
 
-    private void addRightEndToLastMeasure(Document document, XPath xpath) throws Exception {
-        NodeList searchResultsList = (NodeList) xpath.compile("//measure").evaluate(document, XPathConstants.NODESET);
+    private void addRightEndToLastMeasure(Node node) throws Exception {
+        NodeList searchResultsList = (NodeList) xpath.compile("//measure").evaluate(node, XPathConstants.NODESET);
         Node lastMeasure = searchResultsList.item(searchResultsList.getLength() - 1);
         ((Element) lastMeasure).setAttribute("right", "end");
     }
 
-    private void addMeasureNumbers(Document document, XPath xpath) throws Exception {
+    private void addMeasureNumbers(Document document) throws Exception {
         NodeList searchResultsList = (NodeList) xpath.compile("//measure").evaluate(document, XPathConstants.NODESET);
         for (int i = 0; i < searchResultsList.getLength(); i++) {
             Node n = searchResultsList.item(i);
@@ -136,17 +135,8 @@ public class MeiHandler extends AbstractHandler {
                 }
                 Node meiNode = searchResultsList.item(meiNoteCounter);
                 String meiId = meiNode.getAttributes().getNamedItem("xml:id").getNodeValue();
-                String meiOct = meiNode.getAttributes().getNamedItem("oct").getNodeValue();
-                String meiPName = meiNode.getAttributes().getNamedItem("pname").getNodeValue();
-
                 MidiNote midiNote = midiRoot.getTracks().get(i).getNotes().get(j);
-                String midiNoteName = simplifyNoteName(midiNote);
-
-                if (!midiNoteName.equals(meiPName + meiOct)) {
-                    throw new Exception("Invalid note name: " + midiNoteName + ";" + meiPName + ";" + meiOct);
-                } else {
-                    midiNote.setId(meiId);
-                }
+                midiNote.setId(meiId);
                 ++meiNoteCounter;
             }
         }

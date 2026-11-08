@@ -19,8 +19,10 @@ public class ConvertTest {
             String menuJson = IOUtils.toString(new FileInputStream(basePath + "menu.json"), StandardCharsets.UTF_8);
             MenuRoot menuRoot = jsonMapper.readValue(menuJson, MenuRoot.class);
             for (MenuItem menuItem : menuRoot.getMenuItems()) {
-                convert(menuItem);
-                break;
+                if (menuItem.getInstrument().equals("piano")) {
+                    System.out.println(menuItem.getPath());
+                    convert(menuItem);
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -24,6 +24,7 @@ public class MusicXmlHandler extends AbstractHandler {
             idNode.setNodeValue(prefix + "id" + (i + 1));
             n.getAttributes().setNamedItem(idNode);
         }
+        removeByXPath("//lyric", document);
     }
 
     private boolean isRehearsalMarkStart(Node prev) throws Exception {

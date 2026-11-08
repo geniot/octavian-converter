@@ -10,6 +10,7 @@ import io.sf.carte.echosvg.transcoder.TranscoderInput;
 import io.sf.carte.echosvg.transcoder.TranscoderOutput;
 import io.sf.carte.echosvg.transcoder.TranscodingHints;
 import io.sf.carte.echosvg.transcoder.image.PNGTranscoder;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.imageio.ImageIO;
@@ -26,7 +27,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class ProcessStarter {
+    private final boolean isVerbose = false;
+
     public String xml2mei(String xml) throws Exception {
         List<String> args = new ArrayList<>(Arrays.asList(
                 "./verovio",
@@ -36,7 +40,7 @@ public class ProcessStarter {
                 "--output-to", "mei",
                 "--input-from", "xml"
         ));
-        return new String(runProcess(args, xml.getBytes(StandardCharsets.UTF_8), ".xml", ".mei", "--outfile", true, true), StandardCharsets.UTF_8);
+        return new String(runProcess(args, xml.getBytes(StandardCharsets.UTF_8), ".xml", ".mei", "--outfile", true, isVerbose), StandardCharsets.UTF_8);
     }
 
     public String mei2svg(String mei) throws Exception {
@@ -52,17 +56,17 @@ public class ProcessStarter {
                 "--output-to", "svg",
                 "--input-from", "mei"
         ));
-        return new String(runProcess(args, mei.getBytes(StandardCharsets.UTF_8), ".mei", ".svg", "--outfile", true, true), StandardCharsets.UTF_8);
+        return new String(runProcess(args, mei.getBytes(StandardCharsets.UTF_8), ".mei", ".svg", "--outfile", true, isVerbose), StandardCharsets.UTF_8);
     }
 
     public byte[] xml2midi(String xml) throws Exception {
         ArrayList<String> args = new ArrayList<>(List.of("/opt/musescore/musescore"));
-        return runProcess(args, xml.getBytes(StandardCharsets.UTF_8), ".xml", ".mid", "-o", true, true);
+        return runProcess(args, xml.getBytes(StandardCharsets.UTF_8), ".xml", ".mid", "-o", true, isVerbose);
     }
 
     public String midi2json(byte[] midiBbs) throws Exception {
         ArrayList<String> args = new ArrayList<>(List.of("./midi2json"));
-        return new String(runProcess(args, midiBbs, ".mid", ".json", "", false, true), StandardCharsets.UTF_8);
+        return new String(runProcess(args, midiBbs, ".mid", ".json", "", false, isVerbose), StandardCharsets.UTF_8);
     }
 
     public byte[] getPngBytesEchoSvg(String svg) throws Exception {
@@ -79,7 +83,7 @@ public class ProcessStarter {
         os.flush();
         os.close();
         byte[] bbs = os.toByteArray();
-        System.out.println("SVG->PNG took: " + (System.currentTimeMillis() - time));
+        log.info("SVG->PNG took: {}", System.currentTimeMillis() - time);
         return bbs;
     }
 

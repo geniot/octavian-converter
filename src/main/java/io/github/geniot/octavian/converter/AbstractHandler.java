@@ -57,7 +57,7 @@ public abstract class AbstractHandler {
     }
 
 
-    protected void removeAttributeByXPath(String expression, Node node, XPath xpath, String attr) throws Exception {
+    protected void removeAttributeByXPath(String expression, Node node, String attr) throws Exception {
         NodeList searchResultsList = (NodeList) xpath.compile(expression).evaluate(node, XPathConstants.NODESET);
         for (int i = 0; i < searchResultsList.getLength(); i++) {
             Node n = searchResultsList.item(i);
@@ -67,7 +67,7 @@ public abstract class AbstractHandler {
         }
     }
 
-    protected void removeByXPath(String expression, Node node, XPath xpath) throws Exception {
+    protected void removeByXPath(String expression, Node node) throws Exception {
         NodeList searchResultsList = (NodeList) xpath.compile(expression).evaluate(node, XPathConstants.NODESET);
         for (int i = 0; i < searchResultsList.getLength(); i++) {
             Node n = searchResultsList.item(i);
