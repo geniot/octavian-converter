@@ -16,10 +16,11 @@ public class ConvertTest {
 
     static void main(String[] args) {
         try {
+            String selected = "warsaw_mazurka";
             String menuJson = IOUtils.toString(new FileInputStream(basePath + "menu.json"), StandardCharsets.UTF_8);
             MenuRoot menuRoot = jsonMapper.readValue(menuJson, MenuRoot.class);
             for (MenuItem menuItem : menuRoot.getMenuItems()) {
-                if (menuItem.getInstrument().equals("piano")) {
+                if (menuItem.getInstrument().equals("piano") && menuItem.getPath().endsWith(selected)) {
                     System.out.println(menuItem.getPath());
                     convert(menuItem);
                 }

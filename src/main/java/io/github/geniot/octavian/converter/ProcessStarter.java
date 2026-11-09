@@ -83,7 +83,7 @@ public class ProcessStarter {
         os.flush();
         os.close();
         byte[] bbs = os.toByteArray();
-        log.info("SVG->PNG took: {}", System.currentTimeMillis() - time);
+        log.debug("SVG->PNG took: {}", System.currentTimeMillis() - time);
         return bbs;
     }
 
