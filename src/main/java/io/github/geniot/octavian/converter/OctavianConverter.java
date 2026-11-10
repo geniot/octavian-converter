@@ -44,9 +44,10 @@ public class OctavianConverter {
         SvgHandler svgHandler = new SvgHandler(svg);
         FileUtils.write(new File("tmp/out.svg"), svgHandler.document2string(), StandardCharsets.UTF_8);
 
-        byte[] png = processStarter.getPngBytesEchoSvg(svgHandler.document2string());
-//        byte[] png = processStarter.getPngBytesJSVG(svgHandler.document2string());
-        PngHandler pngHandler = new PngHandler(png);
+        byte[] png1 = processStarter.getPngBytesJairoSVG(svgHandler.document2string());
+//        byte[] png2 = processStarter.getPngBytesEchoSvg(svgHandler.document2string());
+//        byte[] png3 = processStarter.getPngBytesJSVG(svgHandler.document2string());
+        PngHandler pngHandler = new PngHandler(png1);
 //        pngHandler.debugLines(new TreeSet<>(svgHandler.geNoteOffsets().values()), Color.BLUE, new BasicStroke(1));
         FileUtils.writeByteArrayToFile(new File("tmp/out.png"), pngHandler.image2bytes());
 

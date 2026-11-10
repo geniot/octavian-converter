@@ -6,6 +6,7 @@ import com.github.weisj.jsvg.parser.SVGLoader;
 import com.github.weisj.jsvg.view.FloatSize;
 import com.zaxxer.nuprocess.NuProcess;
 import com.zaxxer.nuprocess.NuProcessBuilder;
+import io.brunoborges.jairosvg.JairoSVG;
 import io.sf.carte.echosvg.transcoder.TranscoderInput;
 import io.sf.carte.echosvg.transcoder.TranscoderOutput;
 import io.sf.carte.echosvg.transcoder.TranscodingHints;
@@ -83,17 +84,26 @@ public class ProcessStarter {
         os.flush();
         os.close();
         byte[] bbs = os.toByteArray();
-        log.debug("SVG->PNG took: {}", System.currentTimeMillis() - time);
+        log.info("EchoSvg SVG->PNG took: {}", System.currentTimeMillis() - time);
+        return bbs;
+    }
+
+    public byte[] getPngBytesJairoSVG(String svg) throws Exception {
+        long time = System.currentTimeMillis();
+        SvgHandler jairoHackHandler = new SvgHandler(svg);
+        jairoHackHandler.removeBoundingBoxes();
+        svg = jairoHackHandler.document2string();
+        byte[] bbs = JairoSVG.svg2png(svg.getBytes(StandardCharsets.UTF_8));
+        log.info("JairoSVG SVG->PNG took: {}", System.currentTimeMillis() - time);
         return bbs;
     }
 
     public byte[] getPngBytesJSVG(String svg) throws Exception {
-        svg = svg.replaceFirst("<style type=\"text/css\">", "<style type=\"text/css\">[stroke-width=\"0\"] { stroke: none !important };");
         long time = System.currentTimeMillis();
+        svg = svg.replaceFirst("<style type=\"text/css\">", "<style type=\"text/css\">[stroke-width=\"0\"] { stroke: none !important };");
         SVGLoader loader = new SVGLoader();
         ByteArrayInputStream is = new ByteArrayInputStream(svg.getBytes(StandardCharsets.UTF_8));
         SVGDocument svgDocument = loader.load(is, null, LoaderContext.createDefault());
-
         FloatSize size = svgDocument.size();
         BufferedImage image = new BufferedImage((int) size.width, (int) size.height, BufferedImage.TYPE_INT_ARGB_PRE);
         Graphics2D g = image.createGraphics();
@@ -104,7 +114,7 @@ public class ProcessStarter {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(image, "png", baos);
         byte[] bbs = baos.toByteArray();
-        System.out.println("SVG->PNG took: " + (System.currentTimeMillis() - time));
+        log.info("JSVG SVG->PNG took: {}", System.currentTimeMillis() - time);
         return bbs;
     }
 

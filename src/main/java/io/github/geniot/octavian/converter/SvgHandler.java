@@ -133,6 +133,11 @@ public class SvgHandler extends AbstractHandler {
         }
     }
 
+    public void removeBoundingBoxes() throws Exception {
+        removeByXPath("//g[contains(@class, 'bounding-box')]", document);
+        removeByXPath("//g[contains(@class, 'content-bounding-box')]", document);
+    }
+
     public int getPlayHeadWidth() throws Exception {
         NodeList notesList = (NodeList) xpath.compile("//g[@class='note bounding-box']/rect").evaluate(document, XPathConstants.NODESET);
 

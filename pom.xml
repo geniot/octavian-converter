@@ -103,6 +103,12 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>io.brunoborges</groupId>
+            <artifactId>jairosvg</artifactId>
+            <version>1.0.17-SNAPSHOT</version>
+        </dependency>
+
         <!-- Source: https://mvnrepository.com/artifact/io.sf.carte/echosvg-all -->
         <dependency>
             <groupId>io.sf.carte</groupId>
