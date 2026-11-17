@@ -26,7 +26,7 @@ public class PointsHandler {
                 int midiValue = midiNote.getMidi();
 
                 Point onPoint = points.getOrDefault(onTimestamp, new Point());
-                setOffsetX(onPoint, midiNote, noteOffsets);
+                setOffsetX(onPoint, noteOffsets.get(midiNote.getId()));
                 onPoint.setTimestamp(onTimestamp);
                 Note onNote = new Note();
                 onNote.setId(midiNote.getId());
@@ -51,11 +51,7 @@ public class PointsHandler {
         }
     }
 
-    private void setOffsetX(Point onPoint, MidiNote midiNote, Map<String, Integer> noteOffsets) throws Exception {
-        Integer offset = noteOffsets.get(midiNote.getId());
-        if (offset == null) {
-            throw new Exception("Note id not found: " + midiNote.getId());
-        }
+    private void setOffsetX(Point onPoint, Integer offset) throws Exception {
         if (onPoint.getOffsetX() != null && !onPoint.getOffsetX().equals(offset)) {
             throw new Exception("Offset X not equal: " + onPoint.getOffsetX());
         }

@@ -10,10 +10,10 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.json.JsonMapper;
 
+import java.awt.*;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.SortedSet;
+import java.util.*;
 
 
 /**
@@ -43,20 +43,24 @@ public class OctavianConverter {
         String svg = processStarter.mei2svg(meiHandler.document2string());
         SvgHandler svgHandler = new SvgHandler(svg);
         FileUtils.write(new File("tmp/out.svg"), svgHandler.document2string(), StandardCharsets.UTF_8);
+        Map<String, Integer> noteOffsets = svgHandler.geNoteOffsets();
 
         byte[] png1 = processStarter.getPngBytesJairoSVG(svgHandler.document2string());
 //        byte[] png2 = processStarter.getPngBytesEchoSvg(svgHandler.document2string());
 //        byte[] png3 = processStarter.getPngBytesJSVG(svgHandler.document2string());
         PngHandler pngHandler = new PngHandler(png1);
-//        pngHandler.debugLines(new TreeSet<>(svgHandler.geNoteOffsets().values()), Color.BLUE, new BasicStroke(1));
         FileUtils.writeByteArrayToFile(new File("tmp/out.png"), pngHandler.image2bytes());
+
+        PngHandler pngDebugHandler = new PngHandler(png1);
+        pngDebugHandler.debugLines(new TreeSet<>(noteOffsets.values()), Color.BLUE, new BasicStroke(1));
+        FileUtils.writeByteArrayToFile(new File("tmp/out_debug.png"), pngDebugHandler.image2bytes());
 
         byte[] midi = processStarter.xml2midi(musicXmlHandler.document2string());
         FileUtils.writeByteArrayToFile(new File("tmp/out.mid"), midi);
         String midiJson = processStarter.midi2json(midi);
         FileUtils.write(new File("tmp/out.json"), midiJson, StandardCharsets.UTF_8);
         MidiRoot midiRoot = jsonMapper.readValue(midiJson, MidiRoot.class);
-        meiHandler.setIdsToMidiNotes(midiRoot);
+        meiHandler.setIdsToMidiNotes(midiRoot, invert(noteOffsets, String.valueOf(1)), invert(noteOffsets, String.valueOf(2)));
 
         Tune tune = new Tune();
         String[] titleAndAuthor = musicXmlHandler.getTitleAndAuthor();
@@ -71,7 +75,7 @@ public class OctavianConverter {
         tune.setPlayHeadWidth(svgHandler.getPlayHeadWidth() + 1);
 
         IndexedTreeMap<Integer, Point> points = new IndexedTreeMap<>();
-        pointsHandler.addPoints(points, midiRoot, svgHandler.geNoteOffsets());
+        pointsHandler.addPoints(points, midiRoot, noteOffsets);
         pointsHandler.setOffsetsToOffPoints(new ArrayList<>(points.values()), tune.getSheetWidth());
         pointsHandler.setBars(points, tune.getBarOffsets());
         if (musicXmlHandler.getInstrument().equals(Instrument.Accordion)) {
@@ -87,6 +91,24 @@ public class OctavianConverter {
         response.setPngSheet(pngHandler.image2bytes());
 
         return response;
+    }
+
+    private SortedMap<Integer, Set<String>> invert(Map<String, Integer> noteOffsets, String part) {
+        SortedMap<Integer, Set<String>> result = new TreeMap<>();
+        for (Map.Entry<String, Integer> entry : noteOffsets.entrySet()) {
+            String key = entry.getKey();
+            String[] splits = key.split("-");
+            String keyPart = splits[splits.length - 1];
+            if (splits[splits.length - 1].startsWith("rend")) {
+                keyPart = splits[splits.length - 2];
+            }
+            if (keyPart.equals(part)) {
+                Set<String> ids = result.getOrDefault(entry.getValue(), new HashSet<>());
+                ids.add(entry.getKey());
+                result.put(entry.getValue(), ids);
+            }
+        }
+        return result;
     }
 
 

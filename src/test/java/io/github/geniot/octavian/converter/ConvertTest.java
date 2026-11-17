@@ -16,7 +16,7 @@ public class ConvertTest {
 
     static void main(String[] args) {
         try {
-            String selected = "green_grasshopper";
+            String selected = "yablochko";
             String instrument = "accordion-button";
             String menuJson = IOUtils.toString(new FileInputStream(basePath + instrument + "/menu.json"), StandardCharsets.UTF_8);
             MenuRoot menuRoot = jsonMapper.readValue(menuJson, MenuRoot.class);

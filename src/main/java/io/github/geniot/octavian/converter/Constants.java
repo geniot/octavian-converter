@@ -1,11 +1,9 @@
 package io.github.geniot.octavian.converter;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Constants {
-    public static final String[] NOTES = new String[]{"C", "CD", "D", "DE", "E", "F", "FG", "G", "GA", "A", "AB", "B"};
+    public static final List<String> NOTES = Arrays.asList("C", "CD", "D", "DE", "E", "F", "FG", "G", "GA", "A", "AB", "B");
     public static final Map<Integer, String> NOTE_NAME_MAP =
             Collections.unmodifiableMap(new HashMap<>() {{
                 put(21, "A0");

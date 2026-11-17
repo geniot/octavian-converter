@@ -3,14 +3,14 @@ package io.github.geniot.octavian.converter;
 import io.github.geniot.octavian.converter.json.*;
 import io.github.geniot.octavian.converter.midi.MidiNote;
 import io.github.geniot.octavian.converter.midi.MidiRoot;
+import io.github.geniot.octavian.converter.midi.MidiTrack;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPathConstants;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class MeiHandler extends AbstractHandler {
     private Map<String, String> tiesMap;
@@ -123,23 +123,63 @@ public class MeiHandler extends AbstractHandler {
         return prev;
     }
 
-    public void setIdsToMidiNotes(MidiRoot midiRoot) throws Exception {
+    public void setIdsToMidiNotes(MidiRoot midiRoot,
+                                  SortedMap<Integer, Set<String>> noteOffsets1,
+                                  SortedMap<Integer, Set<String>> noteOffsets2) throws Exception {
+        int staffCounter = 1;
         for (int i = 0; i < midiRoot.getTracks().size(); i++) {
-            NodeList searchResultsList = (NodeList) xpath.compile("//staff[@n='" + (i + 1) + "']//note").evaluate(document, XPathConstants.NODESET);
-            int meiNoteCounter = 0;
-            for (int j = 0; j < midiRoot.getTracks().get(i).getNotes().size(); j++) {
+            MidiTrack midiTrack = midiRoot.getTracks().get(i);
+            if (midiTrack.getNotes().isEmpty()) {
+                continue;
+            }
+            SortedMap<Integer, Set<String>> noteOffsets = staffCounter == 1 ? noteOffsets1 : noteOffsets2;
+            SortedMap<Integer, Set<MidiNote>> midiMap = genMap(midiTrack);
 
-                //skipping tied notes (not bound to audible notes)
-                if (this.tiesMap.containsValue(searchResultsList.item(meiNoteCounter).getAttributes().getNamedItem("xml:id").getNodeValue())) {
-                    ++meiNoteCounter;
+            Iterator<Map.Entry<Integer, Set<String>>> svgIterator = noteOffsets.entrySet().iterator();
+            Map.Entry<Integer, Set<String>> svgEntry = svgIterator.next();
+            for (Map.Entry<Integer, Set<MidiNote>> midiEntry : midiMap.entrySet()) {
+                for (MidiNote midiNote : midiEntry.getValue()) {
+                    midiNote.setId(findIdByValue(svgEntry.getValue(), String.valueOf(midiNote.getMidi())));
                 }
-                Node meiNode = searchResultsList.item(meiNoteCounter);
-                String meiId = meiNode.getAttributes().getNamedItem("xml:id").getNodeValue();
-                MidiNote midiNote = midiRoot.getTracks().get(i).getNotes().get(j);
-                midiNote.setId(meiId);
-                ++meiNoteCounter;
+                svgEntry = svgIterator.hasNext() ? svgIterator.next() : svgEntry;
+                if (isSilent(svgEntry.getValue())) {
+                    svgEntry = svgIterator.hasNext() ? svgIterator.next() : svgEntry;
+                }
+            }
+            ++staffCounter;
+        }
+    }
+
+    private boolean isSilent(Set<String> set) {
+        for (String id : set) {
+            if (!this.tiesMap.containsValue(id)) {
+                return false;
             }
         }
+        return true;
+    }
+
+    private String findIdByValue(Set<String> ids, String value) throws Exception {
+        for (String id : ids) {
+            String[] splits = id.split("-");
+            String lastToken = splits[splits.length - 1];
+            int offset = lastToken.startsWith("rend") ? 3 : 2;
+            if (splits[splits.length - offset].equals(value)) {
+                return id;
+            }
+        }
+        throw new Exception("Couldn't find id by value: " + value);
+    }
+
+    private SortedMap<Integer, Set<MidiNote>> genMap(MidiTrack midiTrack) {
+        SortedMap<Integer, Set<MidiNote>> result = new TreeMap<>();
+        for (int j = 0; j < midiTrack.getNotes().size(); j++) {
+            MidiNote midiNote = midiTrack.getNotes().get(j);
+            Set<MidiNote> notes = result.getOrDefault(midiNote.getTicks(), new HashSet<>());
+            notes.add(midiNote);
+            result.put(midiNote.getTicks(), notes);
+        }
+        return result;
     }
 
 

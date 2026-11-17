@@ -1,5 +1,6 @@
 package io.github.geniot.octavian.converter;
 
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -7,6 +8,7 @@ import javax.xml.xpath.XPathConstants;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class MusicXmlHandler extends AbstractHandler {
 
     public MusicXmlHandler(String xml) throws Exception {
@@ -15,16 +17,35 @@ public class MusicXmlHandler extends AbstractHandler {
     }
 
     void fix() throws Exception {
-        //add id to each note, prefix rehearsal starting notes with 'reh-', suffix '-rendN' will be added later by verovio when necessary
-        NodeList searchResultsList = (NodeList) xpath.compile("//note").evaluate(document, XPathConstants.NODESET);
-        for (int i = 0; i < searchResultsList.getLength(); i++) {
-            Node n = searchResultsList.item(i);
-            String prefix = isRehearsalMarkStart(n) ? "reh-" : "";
-            Node idNode = document.createAttribute("id");
-            idNode.setNodeValue(prefix + "id" + (i + 1));
-            n.getAttributes().setNamedItem(idNode);
+        NodeList partsList = (NodeList) xpath.compile("//part").evaluate(document, XPathConstants.NODESET);
+        for (int p = 0; p < partsList.getLength(); p++) {
+            Node partNode = partsList.item(p);
+            //add id to each note, prefix rehearsal starting notes with 'reh-', suffix '-rendN' will be added later by verovio when necessary
+            NodeList notesList = (NodeList) xpath.compile(".//note").evaluate(partNode, XPathConstants.NODESET);
+            for (int i = 0; i < notesList.getLength(); i++) {
+                Node n = notesList.item(i);
+                String prefix = isRehearsalMarkStart(n) ? "reh-" : "";
+                int suffix = getNumericNoteValue(n);
+                Node idNode = document.createAttribute("id");
+                idNode.setNodeValue(prefix + "id" + (i + 1) + "-" + suffix + "-" + (p + 1));
+                n.getAttributes().setNamedItem(idNode);
+            }
         }
         removeByXPath("//lyric", document);
+    }
+
+    private int getNumericNoteValue(Node n) throws Exception {
+        boolean isRest = getByXPath(".//rest", n) != null;
+        if (isRest) {
+            return 0;
+        } else {
+            String step = getByXPath(".//pitch/step/text()", n);
+            String alterStr = getByXPath(".//pitch/alter/text()", n);
+            String octaveStr = getByXPath(".//pitch/octave/text()", n);
+            int octave = Integer.parseInt(octaveStr) + 1;
+            int alter = alterStr == null ? 0 : Integer.parseInt(alterStr);
+            return octave * Constants.NOTES.size() + Constants.NOTES.indexOf(step) + alter;
+        }
     }
 
     private boolean isRehearsalMarkStart(Node prev) throws Exception {
@@ -49,7 +70,7 @@ public class MusicXmlHandler extends AbstractHandler {
             titleAndAuthor.add(n.getTextContent());
         }
         if (titleAndAuthor.size() != 2) {
-            logger.error("Title and Author are not correct");
+            log.error("Title and Author are not correct");
         }
         return titleAndAuthor.toArray(new String[0]);
     }

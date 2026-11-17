@@ -2,8 +2,7 @@ package io.github.geniot.octavian.converter;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -24,8 +23,8 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 
+@Slf4j
 public abstract class AbstractHandler {
-    static Logger logger = LoggerFactory.getLogger(AbstractHandler.class);
 
     XmlMapper xmlMapper = new XmlMapper();
     DocumentBuilder docBuilder;
@@ -64,6 +63,15 @@ public abstract class AbstractHandler {
             if (n.getAttributes().getNamedItem(attr) != null) {
                 n.getAttributes().removeNamedItem(attr);
             }
+        }
+    }
+
+    protected String getByXPath(String expression, Node node) throws Exception {
+        NodeList searchResultsList = (NodeList) xpath.compile(expression).evaluate(node, XPathConstants.NODESET);
+        if (searchResultsList.getLength() > 0) {
+            return searchResultsList.item(0).getTextContent();
+        } else {
+            return null;
         }
     }
 

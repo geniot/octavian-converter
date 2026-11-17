@@ -1,7 +1,6 @@
 package io.github.geniot.octavian.converter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -9,8 +8,8 @@ import org.w3c.dom.NodeList;
 import javax.xml.xpath.XPathConstants;
 import java.util.*;
 
+@Slf4j
 public class SvgHandler extends AbstractHandler {
-    static Logger logger = LoggerFactory.getLogger(SvgHandler.class);
 
     public SvgHandler(String xml) throws Exception {
         super(xml);
