@@ -143,12 +143,12 @@ public class PointsHandler {
 
     public void convertBassNotesToChords(IndexedTreeMap<Integer, Point> points) throws Exception {
         for (Point point : points.values()) {
-            point.setNotesOn(notes2chords(point.getNotesOn()));
-            point.setNotesOff(notes2chords(point.getNotesOff()));
+            point.setNotesOn(notes2chords(point.getNotesOn(), true));
+            point.setNotesOff(notes2chords(point.getNotesOff(), false));
         }
     }
 
-    private List<Note> notes2chords(List<Note> notes) throws Exception {
+    private List<Note> notes2chords(List<Note> notes, boolean isOn) throws Exception {
         List<Note> rightHandNotes = notes.stream().filter(note -> note.getNoteType().equals(NoteType.RIGHT_HAND_NOTE)).toList();
         List<Note> leftHandNotes = notes.stream().filter(note -> note.getNoteType().equals(NoteType.LEFT_HAND_BASS)).toList();
         if (notes.size() != rightHandNotes.size() + leftHandNotes.size()) {
@@ -169,6 +169,9 @@ public class PointsHandler {
                         chordNote.setNoteType(NoteType.LEFT_HAND_CHORD);
                         chordNote.setNoteName(chord.getValue());
                         chordNote.setChordName(chord.getKey());
+                        if (isOn) {
+                            chordNote.setDuration(getChordDuration(chord.getValue(), leftHandNotesMap));
+                        }
                         result.add(chordNote);
                     } else {
                         result.add(leftHandNotesMap.get(split));
@@ -179,6 +182,17 @@ public class PointsHandler {
             result.addAll(leftHandNotes);
         }
         return result;
+    }
+
+    private int getChordDuration(String chord, Map<String, Note> notesMap) throws Exception {
+        String[] splits = chord.split("\\s");
+        Integer duration = notesMap.get(splits[0]).getDuration();
+        for (String split : splits) {
+            if (!notesMap.get(splits[0]).getDuration().equals(duration)) {
+                throw new Exception("Unexpected chord duration");
+            }
+        }
+        return duration;
     }
 
     private Map.Entry<String, String> findChord(String str) {

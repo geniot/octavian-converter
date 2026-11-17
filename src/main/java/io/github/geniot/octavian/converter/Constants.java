@@ -51,7 +51,7 @@ public class Constants {
                     Map.entry("FG7", "FG2 CD3 E3 AB3"),
                     Map.entry("FGm", "FG2 CD3 A3"),
                     Map.entry("FGd", "FG2 C3 DE3 A3"),
-                    Map.entry("G", "G2 D3 B3"),
+                    Map.entry("G", "G3 B3 D4"),
                     Map.entry("Gm", "G2 D3 AB3"),
                     Map.entry("G7", "G2 D3 F3 B3"),
                     Map.entry("Gd", "G2 CD3 E3 AB3"),
