@@ -21,7 +21,7 @@ import java.util.Map;
         "fingers"
 })
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Note implements Serializable {
+public class Note implements Serializable, Comparable<Note> {
     @JsonIgnore
     String id;
     Integer duration;
@@ -30,4 +30,10 @@ public class Note implements Serializable {
     String noteName;
     String chordName;
     Map<HandType, Finger> fingers;
+
+
+    @Override
+    public int compareTo(Note o) {
+        return this.getNoteValue().compareTo(o.getNoteValue());
+    }
 }

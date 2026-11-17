@@ -74,6 +74,10 @@ public class OctavianConverter {
         pointsHandler.addPoints(points, midiRoot, svgHandler.geNoteOffsets());
         pointsHandler.setOffsetsToOffPoints(new ArrayList<>(points.values()), tune.getSheetWidth());
         pointsHandler.setBars(points, tune.getBarOffsets());
+        if (musicXmlHandler.getInstrument().equals(Instrument.Accordion)) {
+            pointsHandler.convertBassNotesToChords(points);
+        }
+        points = pointsHandler.splitOnOffNotes(points);
         tune.setPoints(points.sequencedValues().toArray(new Point[0]));
 
         MeiHandler meiOriginalHandler = new MeiHandler(mei, false);

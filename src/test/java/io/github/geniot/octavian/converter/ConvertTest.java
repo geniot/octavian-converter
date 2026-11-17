@@ -12,15 +12,16 @@ import java.nio.file.Path;
 
 public class ConvertTest {
     private static final JsonMapper jsonMapper = new JsonMapper();
-    private static final String basePath = "/home/vitaly/WebstormProjects/octavian/public/";
+    private static final String basePath = "/home/vitaly/WebstormProjects/octavian/docs/";
 
     static void main(String[] args) {
         try {
-            String selected = "warsaw_mazurka";
-            String menuJson = IOUtils.toString(new FileInputStream(basePath + "menu.json"), StandardCharsets.UTF_8);
+            String selected = "green_grasshopper";
+            String instrument = "accordion-button";
+            String menuJson = IOUtils.toString(new FileInputStream(basePath + instrument + "/menu.json"), StandardCharsets.UTF_8);
             MenuRoot menuRoot = jsonMapper.readValue(menuJson, MenuRoot.class);
             for (MenuItem menuItem : menuRoot.getMenuItems()) {
-                if (menuItem.getInstrument().equals("piano") && menuItem.getPath().endsWith(selected)) {
+                if (menuItem.getPath().endsWith(selected)) {
                     System.out.println(menuItem.getPath());
                     convert(menuItem);
                 }

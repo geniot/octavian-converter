@@ -53,4 +53,17 @@ public class MusicXmlHandler extends AbstractHandler {
         }
         return titleAndAuthor.toArray(new String[0]);
     }
+
+    public Instrument getInstrument() throws Exception {
+        NodeList searchResultsList = (NodeList) xpath.compile("//instrument-name/text()").evaluate(document, XPathConstants.NODESET);
+        if (searchResultsList.getLength() > 0) {
+            Node instrumentNode = searchResultsList.item(0);
+            if (instrumentNode.getTextContent().toLowerCase().contains("accordion")) {
+                return Instrument.Accordion;
+            } else {
+                return Instrument.Piano;
+            }
+        }
+        return Instrument.Piano;
+    }
 }
