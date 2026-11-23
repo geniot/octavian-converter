@@ -12,6 +12,9 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static io.github.geniot.octavian.converter.Constants.CHORDS_MAP;
+import static io.github.geniot.octavian.converter.Constants.CHORD_VALUES_MAP;
+
 public class PointsHandler {
 
     public void addPoints(IndexedTreeMap<Integer, Point> points,
@@ -33,7 +36,7 @@ public class PointsHandler {
                 onNote.setNoteType(i == 0 ? NoteType.RIGHT_HAND_NOTE : NoteType.LEFT_HAND_BASS);
                 onNote.setDuration(duration);
                 onNote.setNoteValue(midiValue);
-                onNote.setNoteName(Constants.NOTE_NAME_MAP.get(midiValue));
+                onNote.setNoteName(Constants.NOTES_MAP.get(midiValue));
                 onPoint.getNotesOn().add(onNote);
 
                 Point offPoint = points.getOrDefault(offTimestamp, new Point());
@@ -42,7 +45,7 @@ public class PointsHandler {
                 offNote.setId(midiNote.getId());
                 offNote.setNoteType(i == 0 ? NoteType.RIGHT_HAND_NOTE : NoteType.LEFT_HAND_BASS);
                 offNote.setNoteValue(midiValue);
-                offNote.setNoteName(Constants.NOTE_NAME_MAP.get(midiValue));
+                offNote.setNoteName(Constants.NOTES_MAP.get(midiValue));
                 offPoint.getNotesOff().add(offNote);
 
                 points.put(onTimestamp, onPoint);
@@ -139,74 +142,88 @@ public class PointsHandler {
 
     public void convertBassNotesToChords(IndexedTreeMap<Integer, Point> points) throws Exception {
         for (Point point : points.values()) {
-            point.setNotesOn(notes2chords(point.getNotesOn(), true));
-            point.setNotesOff(notes2chords(point.getNotesOff(), false));
+            point.setNotesOn(notes2chords(point.getNotesOn(), true, point.getOffsetX()));
+            point.setNotesOff(notes2chords(point.getNotesOff(), false, point.getOffsetX()));
         }
     }
 
-    private List<Note> notes2chords(List<Note> notes, boolean isOn) throws Exception {
-        List<Note> rightHandNotes = notes.stream().filter(note -> note.getNoteType().equals(NoteType.RIGHT_HAND_NOTE)).toList();
-        List<Note> leftHandNotes = notes.stream().filter(note -> note.getNoteType().equals(NoteType.LEFT_HAND_BASS)).toList();
+    private List<Note> notes2chords(List<Note> notes, boolean isOn, int offsetX) throws Exception {
+        List<Note> rightHandNotes = new ArrayList<>(notes.stream().filter(note -> note.getNoteType().equals(NoteType.RIGHT_HAND_NOTE)).toList());
+        List<Note> leftHandNotes = new ArrayList<>(notes.stream().filter(note -> note.getNoteType().equals(NoteType.LEFT_HAND_BASS)).toList());
+        rightHandNotes.sort(Comparator.comparing(Note::getNoteValue));
+        leftHandNotes.sort(Comparator.comparing(Note::getNoteValue));
+
         if (notes.size() != rightHandNotes.size() + leftHandNotes.size()) {
             throw new Exception("Sizes are not equal");
         }
         List<Note> result = new ArrayList<>(rightHandNotes);
-        SortedSet<Note> leftHandNotesSet = new TreeSet<>(leftHandNotes);
-        Map<String, Note> leftHandNotesMap = leftHandNotesSet.stream().collect(Collectors.toMap(Note::getNoteName, Function.identity()));
-        String leftHandNotesStr = toString(leftHandNotesSet);
-        Map.Entry<String, String> chord = findChord(leftHandNotesStr);
-        if (chord != null) {
-            String[] splits = leftHandNotesStr.splitWithDelimiters(chord.getValue(), -1);
-            for (String split : splits) {
-                split = split.trim();
-                if (!split.isEmpty()) {
-                    if (split.equals(chord.getValue())) {
-                        Note chordNote = new Note();
-                        chordNote.setNoteType(NoteType.LEFT_HAND_CHORD);
-                        chordNote.setNoteName(chord.getValue());
-                        chordNote.setChordName(chord.getKey());
-                        if (isOn) {
-                            chordNote.setDuration(getChordDuration(chord.getValue(), leftHandNotesMap));
-                        }
-                        result.add(chordNote);
-                    } else {
-                        result.add(leftHandNotesMap.get(split));
-                    }
+
+        if (leftHandNotes.size() >= 3) {
+            String noteValues = toNotesString(leftHandNotes);
+            String chordStr = findChord(noteValues);
+            Chord chord = CHORD_VALUES_MAP.get(chordStr);
+            if (chordStr != null && chord != null) {
+                Map<Integer, Note> leftHandNotesMap = leftHandNotes.stream().collect(Collectors.toMap(Note::getNoteValue, Function.identity()));
+                Note chordNote = new Note();
+                chordNote.setNoteType(NoteType.LEFT_HAND_CHORD);
+                chordNote.setNoteName(CHORDS_MAP.get(chord));
+                chordNote.setChordName(chord.getChordName());
+                if (isOn) {
+                    List<Note> chordNotes = getNotesFromString(chordStr, leftHandNotesMap);
+                    chordNote.setDuration(getChordDuration(chordNotes));
                 }
+                result.add(chordNote);
+                List<Note> remainingNotes = getNotesFromString(noteValues.substring(chordStr.length()), leftHandNotesMap);
+                result.addAll(remainingNotes);
+            } else {
+                throw new RuntimeException("Couldn't detect the chord at " + offsetX);
+//                result.addAll(leftHandNotes);
             }
+
+
         } else {
             result.addAll(leftHandNotes);
         }
         return result;
     }
 
-    private int getChordDuration(String chord, Map<String, Note> notesMap) throws Exception {
-        String[] splits = chord.split("\\s");
-        Integer duration = notesMap.get(splits[0]).getDuration();
-        for (String split : splits) {
-            if (!notesMap.get(splits[0]).getDuration().equals(duration)) {
-                throw new Exception("Unexpected chord duration");
+    private List<Note> getNotesFromString(String str, Map<Integer, Note> notesMap) {
+        List<Note> result = new ArrayList<>();
+        String[] values = str.split("\\s");
+        for (String value : values) {
+            if (!value.isEmpty()) {
+                result.add(notesMap.get(Integer.parseInt(value)));
             }
         }
-        return duration;
+        return result;
     }
 
-    private Map.Entry<String, String> findChord(String str) {
-        for (Map.Entry<String, String> entry : Constants.NOTE_NAME_CHORD_MAP.entrySet()) {
-            if (str.contains(entry.getValue())) {
-                return entry;
+    private String findChord(String noteValues) {
+        for (Map.Entry<String, Chord> entry : CHORD_VALUES_MAP.entrySet()) {
+            if (noteValues.startsWith(entry.getKey())) {
+                return entry.getKey();
             }
         }
         return null;
     }
 
-    private String toString(SortedSet<Note> set) {
+    private String toNotesString(List<Note> notesSet) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (Note note : set) {
-            stringBuilder.append(note.getNoteName());
+        notesSet.reversed().forEach((note) -> {
+            stringBuilder.append(note.getNoteValue());
             stringBuilder.append(' ');
-        }
+        });
         return stringBuilder.toString().trim();
+    }
+
+    private int getChordDuration(List<Note> notes) throws Exception {
+        Integer duration = notes.getFirst().getDuration();
+        for (Note note : notes) {
+            if (!note.getDuration().equals(duration)) {
+                throw new Exception("Unexpected chord duration");
+            }
+        }
+        return duration;
     }
 
     /**

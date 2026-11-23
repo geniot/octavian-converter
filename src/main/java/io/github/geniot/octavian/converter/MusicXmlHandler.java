@@ -6,7 +6,9 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPathConstants;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class MusicXmlHandler extends AbstractHandler {
@@ -86,5 +88,27 @@ public class MusicXmlHandler extends AbstractHandler {
             }
         }
         return Instrument.Piano;
+    }
+
+    public Map<String, Chord> getChords() throws Exception {
+        Map<String, Chord> result = new HashMap<>();
+        NodeList measuresResultsList = (NodeList) xpath.compile("//measure").evaluate(document, XPathConstants.NODESET);
+        for (int i = 0; i < measuresResultsList.getLength(); i++) {
+            Node measureNode = measuresResultsList.item(i);
+            String chordName = (String) xpath.compile(".//words/text()").evaluate(measureNode, XPathConstants.STRING);
+            Chord chord = Chord.getByValue(chordName);
+            if (chord == null) {
+                throw new RuntimeException("Couldn't get chord by value");
+            }
+            NodeList notesResultsList = (NodeList) xpath.compile(".//note[staff[text()='2']]").evaluate(measureNode, XPathConstants.NODESET);
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int n = notesResultsList.getLength() - 1; n >= 0; n--) {
+                int value = this.getNumericNoteValue(notesResultsList.item(n));
+                stringBuilder.append(value);
+                stringBuilder.append(' ');
+            }
+            result.put(stringBuilder.toString().trim(), chord);
+        }
+        return result;
     }
 }
