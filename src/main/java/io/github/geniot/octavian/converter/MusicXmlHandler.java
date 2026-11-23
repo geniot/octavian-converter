@@ -19,19 +19,16 @@ public class MusicXmlHandler extends AbstractHandler {
     }
 
     void fix() throws Exception {
-        NodeList partsList = (NodeList) xpath.compile("//part").evaluate(document, XPathConstants.NODESET);
-        for (int p = 0; p < partsList.getLength(); p++) {
-            Node partNode = partsList.item(p);
-            //add id to each note, prefix rehearsal starting notes with 'reh-', suffix '-rendN' will be added later by verovio when necessary
-            NodeList notesList = (NodeList) xpath.compile(".//note").evaluate(partNode, XPathConstants.NODESET);
-            for (int i = 0; i < notesList.getLength(); i++) {
-                Node n = notesList.item(i);
-                String prefix = isRehearsalMarkStart(n) ? "reh-" : "";
-                int suffix = getNumericNoteValue(n);
-                Node idNode = document.createAttribute("id");
-                idNode.setNodeValue(prefix + "id" + (i + 1) + "-" + suffix + "-" + (p + 1));
-                n.getAttributes().setNamedItem(idNode);
-            }
+        //add id to each note, prefix rehearsal starting notes with 'reh-', suffix '-rendN' will be added later by verovio when necessary
+        NodeList notesList = (NodeList) xpath.compile(".//note").evaluate(document, XPathConstants.NODESET);
+        for (int i = 0; i < notesList.getLength(); i++) {
+            Node n = notesList.item(i);
+            String prefix = isRehearsalMarkStart(n) ? "reh-" : "";
+            int suffix = getNumericNoteValue(n);
+            int staff = Integer.parseInt(getByXPath(".//staff/text()", n));
+            Node idNode = document.createAttribute("id");
+            idNode.setNodeValue(prefix + "id" + (i + 1) + "-" + suffix + "-" + staff);
+            n.getAttributes().setNamedItem(idNode);
         }
         removeByXPath("//lyric", document);
     }

@@ -139,7 +139,7 @@ public class MeiHandler extends AbstractHandler {
             Map.Entry<Integer, Set<String>> svgEntry = svgIterator.next();
             for (Map.Entry<Integer, Set<MidiNote>> midiEntry : midiMap.entrySet()) {
                 for (MidiNote midiNote : midiEntry.getValue()) {
-                    midiNote.setId(findIdByValue(svgEntry.getValue(), String.valueOf(midiNote.getMidi())));
+                    midiNote.setId(findIdByValue(svgEntry, midiNote.getMidi()));
                 }
                 svgEntry = svgIterator.hasNext() ? svgIterator.next() : svgEntry;
                 if (isSilent(svgEntry.getValue())) {
@@ -159,16 +159,19 @@ public class MeiHandler extends AbstractHandler {
         return true;
     }
 
-    private String findIdByValue(Set<String> ids, String value) throws Exception {
-        for (String id : ids) {
+    private String findIdByValue(Map.Entry<Integer, Set<String>> entry, int value) throws Exception {
+        for (String id : entry.getValue()) {
             String[] splits = id.split("-");
             String lastToken = splits[splits.length - 1];
             int offset = lastToken.startsWith("rend") ? 3 : 2;
-            if (splits[splits.length - offset].equals(value)) {
+            if (splits[splits.length - offset].equals(String.valueOf(value))) {
+//                System.out.println(id + ":" + Constants.getNoteNameByValue(value));
                 return id;
             }
         }
-        throw new Exception("Couldn't find id by value: " + value);
+        throw new Exception("Couldn't find id by value: " + value + ":" + Constants.getNoteNameByValue(value) +
+                " at " + entry.getKey() +
+                " available ids: " + entry.getValue());
     }
 
     private SortedMap<Integer, Set<MidiNote>> genMap(MidiTrack midiTrack) {

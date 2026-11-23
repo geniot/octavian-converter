@@ -23,6 +23,12 @@ public class Constants {
                 put(108, "C8");
             }});
 
+    public static String getNoteNameByValue(int value) {
+        int octave = value / Constants.NOTES.size() - 1;
+        int rest = value % Constants.NOTES.size();
+        return Constants.NOTES.get(rest) + octave;
+    }
+
     public static final Map<String, Chord> CHORD_VALUES_MAP =
             Collections.unmodifiableMap(new HashMap<>() {{
                 try {
