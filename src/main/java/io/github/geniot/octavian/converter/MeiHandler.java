@@ -126,7 +126,7 @@ public class MeiHandler extends AbstractHandler {
     public void setIdsToMidiNotes(MidiRoot midiRoot,
                                   SortedMap<Integer, Set<String>> noteOffsets1,
                                   SortedMap<Integer, Set<String>> noteOffsets2) throws Exception {
-        int staffCounter = 1;
+        int staffCounter = noteOffsets1.isEmpty() ? 2 : 1;
         for (int i = 0; i < midiRoot.getTracks().size(); i++) {
             MidiTrack midiTrack = midiRoot.getTracks().get(i);
             if (midiTrack.getNotes().isEmpty()) {

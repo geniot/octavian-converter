@@ -170,7 +170,7 @@ public class PointsHandler {
                 chordNote.setChordName(chord.getChordName());
                 if (isOn) {
                     List<Note> chordNotes = getNotesFromString(chordStr, leftHandNotesMap);
-                    chordNote.setDuration(getChordDuration(chordNotes));
+                    chordNote.setDuration(getChordDuration(chordNotes, offsetX));
                 }
                 result.add(chordNote);
                 List<Note> remainingNotes = getNotesFromString(noteValues.substring(chordStr.length()), leftHandNotesMap);
@@ -216,11 +216,14 @@ public class PointsHandler {
         return stringBuilder.toString().trim();
     }
 
-    private int getChordDuration(List<Note> notes) throws Exception {
+    private int getChordDuration(List<Note> notes, int offsetX) throws Exception {
         Integer duration = notes.getFirst().getDuration();
         for (Note note : notes) {
             if (!note.getDuration().equals(duration)) {
-                throw new Exception("Unexpected chord duration");
+                System.out.println("Unexpected chord duration at " + offsetX + "; " +
+                        notes.stream().map(Note::getNoteName).toList() + "; " +
+                        notes.stream().map(Note::getDuration).toList());
+                duration = Math.min(duration, note.getDuration());
             }
         }
         return duration;
