@@ -34,7 +34,7 @@ public class Constants {
                 try {
                     try (InputStream inputStream = Constants.class.getClassLoader().getResourceAsStream("chords.musicxml")) {
                         String xml = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-                        MusicXmlHandler musicXmlHandler = new MusicXmlHandler(xml);
+                        MusicXmlHandler musicXmlHandler = new MusicXmlHandler(xml, Hand.BOTH);
                         this.putAll(musicXmlHandler.getChords());
                     }
                 } catch (Exception ex) {

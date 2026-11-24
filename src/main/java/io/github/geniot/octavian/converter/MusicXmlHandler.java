@@ -13,12 +13,18 @@ import java.util.Map;
 @Slf4j
 public class MusicXmlHandler extends AbstractHandler {
 
-    public MusicXmlHandler(String xml) throws Exception {
+    public MusicXmlHandler(String xml, Hand hand) throws Exception {
         super(xml);
-        this.fix();
+        if (hand.equals(Hand.BOTH)) {
+            this.fix();
+        } else if (hand.equals(Hand.LEFT)) {
+            removeByXPath("//note[staff[text()='2']]", document);
+        } else if (hand.equals(Hand.RIGHT)) {
+            removeByXPath("//note[staff[text()='1']]", document);
+        }
     }
 
-    void fix() throws Exception {
+    private void fix() throws Exception {
         //add id to each note, prefix rehearsal starting notes with 'reh-', suffix '-rendN' will be added later by verovio when necessary
         NodeList notesList = (NodeList) xpath.compile(".//note").evaluate(document, XPathConstants.NODESET);
         for (int i = 0; i < notesList.getLength(); i++) {

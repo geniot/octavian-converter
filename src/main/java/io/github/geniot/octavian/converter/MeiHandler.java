@@ -124,15 +124,12 @@ public class MeiHandler extends AbstractHandler {
     }
 
     public void setIdsToMidiNotes(MidiRoot midiRoot,
-                                  SortedMap<Integer, Set<String>> noteOffsets1,
-                                  SortedMap<Integer, Set<String>> noteOffsets2) throws Exception {
-        int staffCounter = noteOffsets1.isEmpty() ? 2 : 1;
+                                  SortedMap<Integer, Set<String>> noteOffsets) throws Exception {
         for (int i = 0; i < midiRoot.getTracks().size(); i++) {
             MidiTrack midiTrack = midiRoot.getTracks().get(i);
             if (midiTrack.getNotes().isEmpty()) {
                 continue;
             }
-            SortedMap<Integer, Set<String>> noteOffsets = staffCounter == 1 ? noteOffsets1 : noteOffsets2;
             SortedMap<Integer, Set<MidiNote>> midiMap = genMap(midiTrack);
 
             Iterator<Map.Entry<Integer, Set<String>>> svgIterator = noteOffsets.entrySet().iterator();
@@ -146,7 +143,6 @@ public class MeiHandler extends AbstractHandler {
                     svgEntry = svgIterator.hasNext() ? svgIterator.next() : svgEntry;
                 }
             }
-            ++staffCounter;
         }
     }
 

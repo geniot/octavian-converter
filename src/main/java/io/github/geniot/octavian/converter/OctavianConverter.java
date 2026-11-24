@@ -33,7 +33,7 @@ public class OctavianConverter {
     public ConversionResponse convert(String xml) throws Exception {
         ConversionResponse response = new ConversionResponse();
 
-        MusicXmlHandler musicXmlHandler = new MusicXmlHandler(xml);
+        MusicXmlHandler musicXmlHandler = new MusicXmlHandler(xml, Hand.BOTH);
         FileUtils.write(new File("tmp/out.xml"), musicXmlHandler.document2string(), StandardCharsets.UTF_8);
 
         String mei = processStarter.xml2mei(musicXmlHandler.document2string());
@@ -43,24 +43,24 @@ public class OctavianConverter {
         String svg = processStarter.mei2svg(meiHandler.document2string());
         SvgHandler svgHandler = new SvgHandler(svg);
         FileUtils.write(new File("tmp/out.svg"), svgHandler.document2string(), StandardCharsets.UTF_8);
-        Map<String, Integer> noteOffsets = svgHandler.geNoteOffsets();
 
-        byte[] png1 = processStarter.getPngBytesJairoSVG(svgHandler.document2string());
-//        byte[] png2 = processStarter.getPngBytesEchoSvg(svgHandler.document2string());
-//        byte[] png3 = processStarter.getPngBytesJSVG(svgHandler.document2string());
-        PngHandler pngHandler = new PngHandler(png1);
+        Map<String, Integer> noteOffsets = svgHandler.geNoteOffsets();
+        SortedMap<Integer, Set<String>> leftNoteOffsets = invert(noteOffsets, String.valueOf(1));
+        SortedMap<Integer, Set<String>> rightNoteOffsets = invert(noteOffsets, String.valueOf(2));
+
+        byte[] png = processStarter.getPngBytesJairoSVG(svgHandler.document2string());
+        PngHandler pngHandler = new PngHandler(png);
         FileUtils.writeByteArrayToFile(new File("tmp/out.png"), pngHandler.image2bytes());
 
-        PngHandler pngDebugHandler = new PngHandler(png1);
+        PngHandler pngDebugHandler = new PngHandler(png);
         pngDebugHandler.debugLines(new TreeSet<>(noteOffsets.values()), Color.BLUE, new BasicStroke(1));
         FileUtils.writeByteArrayToFile(new File("tmp/out_debug.png"), pngDebugHandler.image2bytes());
 
-        byte[] midi = processStarter.xml2midi(musicXmlHandler.document2string());
-        FileUtils.writeByteArrayToFile(new File("tmp/out.mid"), midi);
-        String midiJson = processStarter.midi2json(midi);
-        FileUtils.write(new File("tmp/out.json"), midiJson, StandardCharsets.UTF_8);
-        MidiRoot midiRoot = jsonMapper.readValue(midiJson, MidiRoot.class);
-        meiHandler.setIdsToMidiNotes(midiRoot, invert(noteOffsets, String.valueOf(1)), invert(noteOffsets, String.valueOf(2)));
+        MidiRoot leftMidiRoot = getMidiRoot(new MusicXmlHandler(musicXmlHandler.document2string(), Hand.LEFT).document2string(), Hand.LEFT);
+        MidiRoot rightMidiRoot = getMidiRoot(new MusicXmlHandler(musicXmlHandler.document2string(), Hand.RIGHT).document2string(), Hand.RIGHT);
+
+        meiHandler.setIdsToMidiNotes(leftMidiRoot, leftNoteOffsets);
+        meiHandler.setIdsToMidiNotes(rightMidiRoot, rightNoteOffsets);
 
         Tune tune = new Tune();
         String[] titleAndAuthor = musicXmlHandler.getTitleAndAuthor();
@@ -75,7 +75,8 @@ public class OctavianConverter {
         tune.setPlayHeadWidth(svgHandler.getPlayHeadWidth() + 1);
 
         IndexedTreeMap<Integer, Point> points = new IndexedTreeMap<>();
-        pointsHandler.addPoints(points, midiRoot, noteOffsets);
+        pointsHandler.addPoints(points, leftMidiRoot, leftNoteOffsets);
+        pointsHandler.addPoints(points, rightMidiRoot, rightNoteOffsets);
         pointsHandler.setOffsetsToOffPoints(new ArrayList<>(points.values()), tune.getSheetWidth());
         pointsHandler.setBars(points, tune.getBarOffsets());
         if (musicXmlHandler.getInstrument().equals(Instrument.Accordion)) {
@@ -91,6 +92,14 @@ public class OctavianConverter {
         response.setPngSheet(pngHandler.image2bytes());
 
         return response;
+    }
+
+    private MidiRoot getMidiRoot(String musicXml, Hand hand) throws Exception {
+        byte[] midi = processStarter.xml2midi(musicXml);
+        FileUtils.writeByteArrayToFile(new File("tmp/out_" + hand.name() + ".mid"), midi);
+        String midiJson = processStarter.midi2json(midi);
+        FileUtils.write(new File("tmp/out_" + hand.name() + ".json"), midiJson, StandardCharsets.UTF_8);
+        return jsonMapper.readValue(midiJson, MidiRoot.class);
     }
 
     private SortedMap<Integer, Set<String>> invert(Map<String, Integer> noteOffsets, String part) {

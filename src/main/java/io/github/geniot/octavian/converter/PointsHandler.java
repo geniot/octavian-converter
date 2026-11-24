@@ -19,7 +19,7 @@ public class PointsHandler {
 
     public void addPoints(IndexedTreeMap<Integer, Point> points,
                           MidiRoot midiRoot,
-                          Map<String, Integer> noteOffsets) throws Exception {
+                          SortedMap<Integer, Set<String>> noteOffsets) throws Exception {
         for (int i = 0; i < midiRoot.getTracks().size(); i++) {
             MidiTrack track = midiRoot.getTracks().get(i);
             for (MidiNote midiNote : track.getNotes()) {
@@ -29,7 +29,7 @@ public class PointsHandler {
                 int midiValue = midiNote.getMidi();
 
                 Point onPoint = points.getOrDefault(onTimestamp, new Point());
-                setOffsetX(onPoint, noteOffsets.get(midiNote.getId()));
+                setOffsetX(onPoint, findById(noteOffsets, midiNote.getId()));
                 onPoint.setTimestamp(onTimestamp);
                 Note onNote = new Note();
                 onNote.setId(midiNote.getId());
@@ -52,6 +52,15 @@ public class PointsHandler {
                 points.put(offTimestamp, offPoint);
             }
         }
+    }
+
+    private Integer findById(SortedMap<Integer, Set<String>> noteOffsets, String id) {
+        for (Map.Entry<Integer, Set<String>> entry : noteOffsets.entrySet()) {
+            if (entry.getValue().contains(id)) {
+                return entry.getKey();
+            }
+        }
+        throw new RuntimeException("Couldn't find offset by id: " + id);
     }
 
     private void setOffsetX(Point onPoint, Integer offset) throws Exception {
