@@ -6,10 +6,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPathConstants;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public class MusicXmlHandler extends AbstractHandler {
@@ -138,6 +135,16 @@ public class MusicXmlHandler extends AbstractHandler {
                 stringBuilder.append(' ');
             }
             result.put(stringBuilder.toString().trim(), chord);
+        }
+        return result;
+    }
+
+    public Set<String> getGraceNotes() throws Exception {
+        Set<String> result = new HashSet<>();
+        NodeList searchResultsList = (NodeList) xpath.compile("//note/grace").evaluate(document, XPathConstants.NODESET);
+        for (int i = 0; i < searchResultsList.getLength(); i++) {
+            Node n = searchResultsList.item(i);
+            result.add(n.getParentNode().getAttributes().getNamedItem("id").getTextContent());
         }
         return result;
     }

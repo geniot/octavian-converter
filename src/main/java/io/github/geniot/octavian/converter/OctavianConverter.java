@@ -50,14 +50,19 @@ public class OctavianConverter {
 
         byte[] png = processStarter.getPngBytesJairoSVG(svgHandler.document2string());
         PngHandler pngHandler = new PngHandler(png);
-        FileUtils.writeByteArrayToFile(new File("tmp/out.png"), pngHandler.image2bytes());
+        FileUtils.writeByteArrayToFile(new File("tmp/out.png"), PngHandler.image2bytes(pngHandler.image));
 
         PngHandler pngDebugHandler = new PngHandler(png);
         pngDebugHandler.debugLines(new TreeSet<>(noteOffsets.values()), Color.BLUE, new BasicStroke(1));
-        FileUtils.writeByteArrayToFile(new File("tmp/out_debug.png"), pngDebugHandler.image2bytes());
+        FileUtils.writeByteArrayToFile(new File("tmp/out_debug.png"), PngHandler.image2bytes(pngDebugHandler.image));
 
-        MidiRoot rightMidiRoot = getMidiRoot(new MusicXmlHandler(musicXmlHandler.document2string(), Hand.RIGHT).document2string(), Hand.RIGHT);
-        MidiRoot leftMidiRoot = getMidiRoot(new MusicXmlHandler(musicXmlHandler.document2string(), Hand.LEFT).document2string(), Hand.LEFT);
+        String rightHandMusicXml = new MusicXmlHandler(musicXmlHandler.document2string(), Hand.RIGHT).document2string();
+        String leftHandMusicXml = new MusicXmlHandler(musicXmlHandler.document2string(), Hand.LEFT).document2string();
+        FileUtils.write(new File("tmp/out_right.xml"), rightHandMusicXml, StandardCharsets.UTF_8);
+        FileUtils.write(new File("tmp/out_left.xml"), leftHandMusicXml, StandardCharsets.UTF_8);
+//        MidiRoot bothMidiRoot = getMidiRoot(musicXmlHandler.document2string(), Hand.BOTH);
+        MidiRoot rightMidiRoot = getMidiRoot(rightHandMusicXml, Hand.RIGHT);
+        MidiRoot leftMidiRoot = getMidiRoot(leftHandMusicXml, Hand.LEFT);
 
         meiHandler.setIdsToMidiNotes(rightMidiRoot, rightNoteOffsets);
         meiHandler.setIdsToMidiNotes(leftMidiRoot, leftNoteOffsets);
@@ -74,9 +79,10 @@ public class OctavianConverter {
         tune.setSelectionRanges(toInts(svgHandler.getSelectionRanges()));
         tune.setPlayHeadWidth(svgHandler.getPlayHeadWidth() + 1);
 
+        Set<String> graceNotes = musicXmlHandler.getGraceNotes();
         IndexedTreeMap<Integer, Point> points = new IndexedTreeMap<>();
-        pointsHandler.addPoints(points, rightMidiRoot, rightNoteOffsets, Hand.RIGHT);
-        pointsHandler.addPoints(points, leftMidiRoot, leftNoteOffsets, Hand.LEFT);
+        pointsHandler.addPoints(points, rightMidiRoot, rightNoteOffsets, graceNotes, Hand.RIGHT);
+        pointsHandler.addPoints(points, leftMidiRoot, leftNoteOffsets, graceNotes, Hand.LEFT);
         pointsHandler.setOffsetsToOffPoints(new ArrayList<>(points.values()), tune.getSheetWidth());
         pointsHandler.setBars(points, tune.getBarOffsets());
         if (musicXmlHandler.getInstrument().equals(Instrument.Accordion)) {
@@ -89,7 +95,7 @@ public class OctavianConverter {
         meiOriginalHandler.setFingeringToTune(tune);
 
         response.setTune(tune);
-        response.setPngSheet(pngHandler.image2bytes());
+        response.setPngSheet(PngHandler.image2bytes(pngHandler.image));
 
         return response;
     }

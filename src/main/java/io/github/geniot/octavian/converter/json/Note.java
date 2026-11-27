@@ -24,6 +24,9 @@ import java.util.Map;
 public class Note implements Serializable, Comparable<Note> {
     @JsonIgnore
     String id;
+    @JsonIgnore
+    boolean grace;
+
     Integer duration;
     NoteType noteType;
     Integer noteValue;

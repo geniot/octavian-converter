@@ -20,6 +20,7 @@ public class PointsHandler {
     public void addPoints(IndexedTreeMap<Integer, Point> points,
                           MidiRoot midiRoot,
                           SortedMap<Integer, Set<String>> noteOffsets,
+                          Set<String> graceNotes,
                           Hand hand) throws Exception {
         NoteType noteType = hand.equals(Hand.RIGHT) ? NoteType.RIGHT_HAND_NOTE : NoteType.LEFT_HAND_BASS;
         for (int i = 0; i < midiRoot.getTracks().size(); i++) {
@@ -31,7 +32,7 @@ public class PointsHandler {
                 int midiValue = midiNote.getMidi();
 
                 Point onPoint = points.getOrDefault(onTimestamp, new Point());
-                setOffsetX(onPoint, findById(noteOffsets, midiNote.getId()));
+                setOffsetX(onPoint, findById(noteOffsets, midiNote.getId()), graceNotes);
                 onPoint.setTimestamp(onTimestamp);
                 Note onNote = new Note();
                 onNote.setId(midiNote.getId());
@@ -65,9 +66,11 @@ public class PointsHandler {
         throw new RuntimeException("Couldn't find offset by id: " + id);
     }
 
-    private void setOffsetX(Point onPoint, Integer offset) throws Exception {
-        if (onPoint.getOffsetX() != null && !onPoint.getOffsetX().equals(offset)) {
-            throw new Exception("Offset X not equal: " + onPoint.getOffsetX());
+    private void setOffsetX(Point onPoint, Integer offset, Set<String> graceNotes) throws Exception {
+        if (onPoint.getOffsetX() != null
+                && !onPoint.getOffsetX().equals(offset)
+                && !graceNotes.contains(onPoint.getNotesOn().getFirst().getId())) {
+            throw new Exception("Offset X not equal: " + onPoint.getOffsetX() + ":" + offset);
         }
         onPoint.setOffsetX(offset);
     }

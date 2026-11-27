@@ -136,23 +136,34 @@ public class MeiHandler extends AbstractHandler {
             Map.Entry<Integer, Set<String>> svgEntry = svgIterator.next();
             for (Map.Entry<Integer, Set<MidiNote>> midiEntry : midiMap.entrySet()) {
                 for (MidiNote midiNote : midiEntry.getValue()) {
-                    midiNote.setId(findIdByValue(svgEntry, midiNote.getMidi()));
+                    String id = findIdByValue(svgEntry, midiNote.getMidi());
+                    midiNote.setId(id);
+//                    System.out.println("Set id to midi note: " + id + ":" + midiNote.getName());
                 }
                 svgEntry = svgIterator.hasNext() ? svgIterator.next() : svgEntry;
-                if (isSilent(svgEntry.getValue())) {
-                    svgEntry = svgIterator.hasNext() ? svgIterator.next() : svgEntry;
+                boolean isSilent = isSilent(svgEntry);
+                while (isSilent) {
+                    if (svgIterator.hasNext()) {
+                        svgEntry = svgIterator.next();
+                        isSilent = isSilent(svgEntry);
+                    } else {
+                        break;
+                    }
                 }
             }
         }
     }
 
-    private boolean isSilent(Set<String> set) {
-        for (String id : set) {
-            if (!this.tiesMap.containsValue(id)) {
-                return false;
+    private boolean isSilent(Map.Entry<Integer, Set<String>> svgEntry) {
+        for (String id : svgEntry.getValue()) {
+            if (this.tiesMap.containsValue(id)) {
+//                if (svgEntry.getValue().size() > 1) {
+//                    System.out.println("More than one note found for silent check at "+svgEntry.getKey());
+//                }
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     private String findIdByValue(Map.Entry<Integer, Set<String>> entry, int value) throws Exception {
@@ -179,12 +190,5 @@ public class MeiHandler extends AbstractHandler {
             result.put(midiNote.getTicks(), notes);
         }
         return result;
-    }
-
-
-    private String simplifyNoteName(MidiNote midiNote) {
-        String name = midiNote.getName();
-        int length = name.length();
-        return (name.charAt(0) + String.valueOf(name.charAt(length - 1))).toLowerCase();
     }
 }

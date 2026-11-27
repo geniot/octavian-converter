@@ -58,9 +58,9 @@ public class PngHandler {
         }
     }
 
-    public byte[] image2bytes() throws Exception {
+    public static byte[] image2bytes(BufferedImage img) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(image, "png", baos);
+        ImageIO.write(img, "png", baos);
         return baos.toByteArray();
     }
 }
