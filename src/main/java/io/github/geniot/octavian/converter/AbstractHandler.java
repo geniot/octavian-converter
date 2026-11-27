@@ -75,11 +75,12 @@ public abstract class AbstractHandler {
         }
     }
 
-    protected void removeByXPath(String expression, Node node) throws Exception {
+    protected int removeByXPath(String expression, Node node) throws Exception {
         NodeList searchResultsList = (NodeList) xpath.compile(expression).evaluate(node, XPathConstants.NODESET);
         for (int i = 0; i < searchResultsList.getLength(); i++) {
             Node n = searchResultsList.item(i);
             n.getParentNode().removeChild(n);
         }
+        return searchResultsList.getLength();
     }
 }

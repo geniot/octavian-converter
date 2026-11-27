@@ -1,6 +1,7 @@
 package io.github.geniot.octavian.converter;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -17,10 +18,16 @@ public class MusicXmlHandler extends AbstractHandler {
         super(xml);
         if (hand.equals(Hand.BOTH)) {
             this.fix();
-        } else if (hand.equals(Hand.LEFT)) {
-            removeByXPath("//note[staff[text()='2']]", document);
         } else if (hand.equals(Hand.RIGHT)) {
-            removeByXPath("//note[staff[text()='1']]", document);
+            int removed = removeByXPath("//note[staff[text()='1']]", document);
+            if (removed == 0) {
+                removeByXPath("//part[@id='P1']//note", document);
+            }
+        } else if (hand.equals(Hand.LEFT)) {
+            int removed = removeByXPath("//note[staff[text()='2']]", document);
+            if (removed == 0) {
+                removeByXPath("//part[@id='P2']//note", document);
+            }
         }
     }
 
@@ -31,12 +38,32 @@ public class MusicXmlHandler extends AbstractHandler {
             Node n = notesList.item(i);
             String prefix = isRehearsalMarkStart(n) ? "reh-" : "";
             int suffix = getNumericNoteValue(n);
-            int staff = Integer.parseInt(getByXPath(".//staff/text()", n));
+            int staff;
+            String staffStr = getByXPath(".//staff/text()", n);
+            if (!StringUtils.isEmpty(staffStr)) {
+                staff = Integer.parseInt(staffStr);
+            } else {
+                staff = getStaffFromParentPart(n);
+            }
+            if (staff == 0) {
+                throw new RuntimeException("Couldn't initialize the staff number");
+            }
             Node idNode = document.createAttribute("id");
             idNode.setNodeValue(prefix + "id" + (i + 1) + "-" + suffix + "-" + staff);
             n.getAttributes().setNamedItem(idNode);
         }
         removeByXPath("//lyric", document);
+    }
+
+    private int getStaffFromParentPart(Node parent) {
+        while (parent != null) {
+            parent = parent.getParentNode();
+            if (parent.getNodeName().equals("part")) {
+                String id = parent.getAttributes().getNamedItem("id").getNodeValue();
+                return Integer.parseInt(id.substring(1));//P1 -> 1
+            }
+        }
+        return 1;
     }
 
     private int getNumericNoteValue(Node n) throws Exception {
