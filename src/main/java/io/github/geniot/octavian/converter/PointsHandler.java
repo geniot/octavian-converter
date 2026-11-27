@@ -19,7 +19,9 @@ public class PointsHandler {
 
     public void addPoints(IndexedTreeMap<Integer, Point> points,
                           MidiRoot midiRoot,
-                          SortedMap<Integer, Set<String>> noteOffsets) throws Exception {
+                          SortedMap<Integer, Set<String>> noteOffsets,
+                          Hand hand) throws Exception {
+        NoteType noteType = hand.equals(Hand.RIGHT) ? NoteType.RIGHT_HAND_NOTE : NoteType.LEFT_HAND_BASS;
         for (int i = 0; i < midiRoot.getTracks().size(); i++) {
             MidiTrack track = midiRoot.getTracks().get(i);
             for (MidiNote midiNote : track.getNotes()) {
@@ -33,7 +35,7 @@ public class PointsHandler {
                 onPoint.setTimestamp(onTimestamp);
                 Note onNote = new Note();
                 onNote.setId(midiNote.getId());
-                onNote.setNoteType(i == 0 ? NoteType.RIGHT_HAND_NOTE : NoteType.LEFT_HAND_BASS);
+                onNote.setNoteType(noteType);
                 onNote.setDuration(duration);
                 onNote.setNoteValue(midiValue);
                 onNote.setNoteName(Constants.NOTES_MAP.get(midiValue));
@@ -43,7 +45,7 @@ public class PointsHandler {
                 offPoint.setTimestamp(offTimestamp);
                 Note offNote = new Note();
                 offNote.setId(midiNote.getId());
-                offNote.setNoteType(i == 0 ? NoteType.RIGHT_HAND_NOTE : NoteType.LEFT_HAND_BASS);
+                offNote.setNoteType(noteType);
                 offNote.setNoteValue(midiValue);
                 offNote.setNoteName(Constants.NOTES_MAP.get(midiValue));
                 offPoint.getNotesOff().add(offNote);

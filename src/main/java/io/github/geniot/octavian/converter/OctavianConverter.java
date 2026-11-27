@@ -45,8 +45,8 @@ public class OctavianConverter {
         FileUtils.write(new File("tmp/out.svg"), svgHandler.document2string(), StandardCharsets.UTF_8);
 
         Map<String, Integer> noteOffsets = svgHandler.geNoteOffsets();
-        SortedMap<Integer, Set<String>> leftNoteOffsets = invert(noteOffsets, String.valueOf(1));
-        SortedMap<Integer, Set<String>> rightNoteOffsets = invert(noteOffsets, String.valueOf(2));
+        SortedMap<Integer, Set<String>> rightNoteOffsets = invert(noteOffsets, String.valueOf(1));
+        SortedMap<Integer, Set<String>> leftNoteOffsets = invert(noteOffsets, String.valueOf(2));
 
         byte[] png = processStarter.getPngBytesJairoSVG(svgHandler.document2string());
         PngHandler pngHandler = new PngHandler(png);
@@ -56,11 +56,11 @@ public class OctavianConverter {
         pngDebugHandler.debugLines(new TreeSet<>(noteOffsets.values()), Color.BLUE, new BasicStroke(1));
         FileUtils.writeByteArrayToFile(new File("tmp/out_debug.png"), pngDebugHandler.image2bytes());
 
-        MidiRoot leftMidiRoot = getMidiRoot(new MusicXmlHandler(musicXmlHandler.document2string(), Hand.LEFT).document2string(), Hand.LEFT);
         MidiRoot rightMidiRoot = getMidiRoot(new MusicXmlHandler(musicXmlHandler.document2string(), Hand.RIGHT).document2string(), Hand.RIGHT);
+        MidiRoot leftMidiRoot = getMidiRoot(new MusicXmlHandler(musicXmlHandler.document2string(), Hand.LEFT).document2string(), Hand.LEFT);
 
-        meiHandler.setIdsToMidiNotes(leftMidiRoot, leftNoteOffsets);
         meiHandler.setIdsToMidiNotes(rightMidiRoot, rightNoteOffsets);
+        meiHandler.setIdsToMidiNotes(leftMidiRoot, leftNoteOffsets);
 
         Tune tune = new Tune();
         String[] titleAndAuthor = musicXmlHandler.getTitleAndAuthor();
@@ -75,8 +75,8 @@ public class OctavianConverter {
         tune.setPlayHeadWidth(svgHandler.getPlayHeadWidth() + 1);
 
         IndexedTreeMap<Integer, Point> points = new IndexedTreeMap<>();
-        pointsHandler.addPoints(points, leftMidiRoot, leftNoteOffsets);
-        pointsHandler.addPoints(points, rightMidiRoot, rightNoteOffsets);
+        pointsHandler.addPoints(points, rightMidiRoot, rightNoteOffsets, Hand.RIGHT);
+        pointsHandler.addPoints(points, leftMidiRoot, leftNoteOffsets, Hand.LEFT);
         pointsHandler.setOffsetsToOffPoints(new ArrayList<>(points.values()), tune.getSheetWidth());
         pointsHandler.setBars(points, tune.getBarOffsets());
         if (musicXmlHandler.getInstrument().equals(Instrument.Accordion)) {

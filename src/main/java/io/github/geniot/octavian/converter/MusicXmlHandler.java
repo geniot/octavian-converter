@@ -19,14 +19,14 @@ public class MusicXmlHandler extends AbstractHandler {
         if (hand.equals(Hand.BOTH)) {
             this.fix();
         } else if (hand.equals(Hand.RIGHT)) {
-            int removed = removeByXPath("//note[staff[text()='1']]", document);
-            if (removed == 0) {
-                removeByXPath("//part[@id='P1']//note", document);
-            }
-        } else if (hand.equals(Hand.LEFT)) {
             int removed = removeByXPath("//note[staff[text()='2']]", document);
             if (removed == 0) {
                 removeByXPath("//part[@id='P2']//note", document);
+            }
+        } else if (hand.equals(Hand.LEFT)) {
+            int removed = removeByXPath("//note[staff[text()='1']]", document);
+            if (removed == 0) {
+                removeByXPath("//part[@id='P1']//note", document);
             }
         }
     }

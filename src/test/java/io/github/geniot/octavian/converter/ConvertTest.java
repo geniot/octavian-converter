@@ -17,15 +17,15 @@ public class ConvertTest {
     static void main(String[] args) {
         try {
             System.out.println(Constants.NOTES.size());//to skip chords debugging
-            String selected = "little_fir_tree";// "yablochko";
-            String instrument = "accordion-piano";
+            String selected = "a_whole_new_world";// "yablochko";
+            String instrument = "accordion-button";
             String menuJson = IOUtils.toString(new FileInputStream(basePath + instrument + "/menu.json"), StandardCharsets.UTF_8);
             MenuRoot menuRoot = jsonMapper.readValue(menuJson, MenuRoot.class);
             for (MenuItem menuItem : menuRoot.getMenuItems()) {
-                if (selected != null && menuItem.getPath().endsWith(selected)) {
+//                if (selected != null && menuItem.getPath().endsWith(selected)) {
                     System.out.println(menuItem.getPath());
                     convert(menuItem);
-                }
+//                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
